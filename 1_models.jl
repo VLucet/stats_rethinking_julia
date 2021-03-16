@@ -62,12 +62,19 @@ end
 # end
 
 m4_3_model = m4_3(df.height, df.weight)
-m4_3_chains = sample(m4_3_model, NUTS(), MCMCThreads(), 1000, 4)
+# m4_3_chains = sample(m4_3_model, NUTS(), MCMCThreads(), 1000, 4)
+m4_3_chains = sample(m4_3_model, NUTS(0.65), 1000)
 StatsPlots.plot(m4_3_chains)
 m4_3_map_estimate = optimize(m4_3_model, MAP())
 vcov(m4_3_map_estimate)
 
-xi = 30.0:0.1:65.0
-yi = mean(m4_3_chains[:α]) .+ mean(m4_3_chains[:β])*(xi .- mean(df.weight))
-scatter(df.weight, df.height, lab="Observations")
-plot!(xi, yi, lab="Regression line")
+xi = minimum(df.weight):0.1:maximum(df.weight)
+p = scatter(df.weight, df.height)
+
+for row in 1:length(m4_3_chains)
+    yi = m4_3_chains[:α][row] .+ m4_3_chains[:β][row] .* (xi .- mean(df.weight))
+    # println(yi)
+    plot!(p, xi, yi, alpha=0.01, color="#000000", lab="")
+end
+
+plot(p)
