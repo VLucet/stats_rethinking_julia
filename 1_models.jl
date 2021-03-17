@@ -43,24 +43,24 @@ m4_2_map_estimate = optimize(m4_2_model, MAP())
 vcov(m4_2_map_estimate)
 
 # m4_3, regression
-@model function m4_3(height, weight)
-    α ~ Normal(178, 20)
-    β ~ LogNormal(0, 1)
-    μ = α .+ β .* (weight.-mean(weight))
-    σ ~ LogNormal(0, 50)
-    height .~ Normal.(μ, σ)
-end
-
-# Equivalent to:
 # @model function m4_3(height, weight)
 #     α ~ Normal(178, 20)
 #     β ~ LogNormal(0, 1)
 #     μ = α .+ β .* (weight.-mean(weight))
 #     σ ~ LogNormal(0, 50)
-#     for i in 1:length(height)
-#         height[i] ~ Normal(μ[i], σ)
-#     end
+#     height .~ Normal.(μ, σ)
 # end
+
+# Equivalent to:
+@model function m4_3(height, weight)
+    α ~ Normal(178, 20)
+    β ~ LogNormal(0, 1)
+    μ = α .+ β .* (weight.-mean(weight))
+    σ ~ LogNormal(0, 5) # Changes the prior here
+    for i in 1:length(height)
+        height[i] ~ Normal(μ[i], σ)
+    end
+end
 
 m4_3_model = m4_3(df.height, df.weight)
 # m4_3_chains = sample(m4_3_model, NUTS(), MCMCThreads(), 1000, 4)
@@ -100,4 +100,32 @@ upper = [q[2] - m for (q, m) in zip(quantiles, m)]
 p2 = scatter(df.weight, df.height)
 plot!(p2, xi, m, ribbon = [lower, upper])
 
-plot(p2)
+# Prediction interval
+
+# @model function m4_3_test(height, weight)
+#     α ~ Normal(178, 20)
+#     β ~ LogNormal(0, 1)
+#     μ = α .+ β .* (weight.-mean(weight))
+#     σ = 0.1
+#     height .~ Normal.(μ, σ)
+# end
+# m4_3_model_test = m4_3_test(df.height, df.weight)
+# m4_3_chains_test = sample(m4_3_model_test, NUTS(0.65), 1000)
+
+x_pred = xi
+m_test = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred)), hcat(x_pred));
+predictions = predict(m_test, m4_3_chains)
+
+pred_array = Array(group(predictions, :height))
+for col in eachcol(pred_array)
+    print(quantile(col))
+end
+
+quantiles_pred = [quantile(col, [0.1, 0.9]) for col in eachcol(pred_array)]
+m_pred = [mean(v) for v in eachcol(pred_array)]
+lower_pred = [q[1] - m for (q, m) in zip(quantiles_pred, m_pred)]
+upper_pred = [q[2] - m for (q, m) in zip(quantiles_pred, m_pred)]
+
+p3 = scatter(df.weight, df.height)
+plot!(p3, xi, m, ribbon = [lower, upper])
+plot!(p3, x_pred, m_pred, ribbon = [lower_pred, upper_pred])
