@@ -51,6 +51,7 @@ vcov(m4_2_map_estimate)
     height .~ Normal.(μ, σ)
 end
 
+# Equivalent to:
 # @model function m4_3(height, weight)
 #     α ~ Normal(178, 20)
 #     β ~ LogNormal(0, 1)
@@ -78,3 +79,25 @@ for row in 1:length(m4_3_chains)
 end
 
 plot(p)
+
+# Credibility interval
+# https://stackoverflow.com/questions/62028147/plotting-credible-intervals-in-julia-from-turing-model
+
+res = DataFrame(m4_3_chains)
+
+function m4_3_model_eq(weight, α, β, mean_weight) 
+    height = α + β * (weight .- mean_weight) 
+end
+
+arr = [m4_3_model_eq.(w, res.α, res.β, mean(df.weight)) for w in xi]
+m = [mean(v) for v in arr]
+
+quantiles = [quantile(v, [0.1, 0.9]) for v in arr]
+
+lower = [q[1] - m for (q, m) in zip(quantiles, m)]
+upper = [q[2] - m for (q, m) in zip(quantiles, m)]
+
+p2 = scatter(df.weight, df.height)
+plot!(p2, xi, m, ribbon = [lower, upper])
+
+plot(p2)
