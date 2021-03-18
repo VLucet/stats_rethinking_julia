@@ -69,7 +69,7 @@ vcov(m4_2_map_estimate)
 
 end
 
-m4_3_model = m4_3(df.height, df.weight)
+m4_3_model = m4_3(df.height, df.weight, missing)
 # m4_3_chains = sample(m4_3_model, NUTS(), MCMCThreads(), 1000, 4)
 m4_3_chains = sample(m4_3_model, NUTS(0.65), 1000)
 StatsPlots.plot(m4_3_chains)
