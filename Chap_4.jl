@@ -1,25 +1,11 @@
-## STATS RETHINKING PRACTICE
+include("all_models.jl")
 
-# Needed libraries
-import CSV
-using DataFrames
-using Turing
-using TuringModels
-using StatsPlots
-using StatsBase
-using Optim
-
-# Data
+### Data
 data_path = joinpath(TuringModels.project_root, "data", "Howell1.csv")
 df = CSV.read(data_path, DataFrame; delim=';')
 df = filter(row -> row.age >= 18, df)
 
-# m4_1
-@model function m4_1(height)
-    σ ~ Uniform(0, 50)
-    μ ~ Normal(178, 20)
-    height .~ Normal.(μ, σ)
-end
+### m4.1
 
 m4_1_model = m4_1(df.height)
 m4_1_chains = sample(m4_1_model, NUTS(0.65), 1000)
@@ -27,12 +13,7 @@ plot(m4_1_chains)
 m4_1_map_estimate = optimize(m4_1_model, MAP())
 vcov(m4_1_map_estimate)
 
-# m4_2, different prior on μ
-@model function m4_2(height)  
-    σ ~ Uniform(0, 50)
-    μ ~ Normal(178, 0.1)
-    height .~ Normal.(μ, σ)
-end
+### m4.2
 
 m4_2_model = m4_2(df.height)
 m4_2_chains = sample(m4_2_model, NUTS(0.65), 1000)
@@ -40,55 +21,11 @@ StatsPlots.plot(m4_2_chains)
 m4_2_map_estimate = optimize(m4_2_model, MAP())
 vcov(m4_2_map_estimate)
 
-# m4_3, regression
-# @model function m4_3(height, weight)
-#     α ~ Normal(178, 20)
-#     β ~ LogNormal(0, 1)
-#     μ = α .+ β .* (weight.-mean(weight))
-#     σ ~ LogNormal(0, 50)
-#     height .~ Normal.(μ, σ)
-# end
-
-# Equivalent to what folows, but smoehow loop is better for predictions
-@model function m4_3(height, weight, weight_mean)
-    
-    if ismissing(weight_mean)
-        weight_mean = mean(weight)
-    end
-    
-    α ~ Normal(178, 20)
-    β ~ LogNormal(0, 1)
-    μ = α .+ β .* (weight.-weight_mean)
-    σ ~ LogNormal(0, 5) # Changes the prior here
-
-    for i in 1:length(height)
-        height[i] ~ Normal(μ[i], σ)
-    end
-
-end
-
-# Different prior on β
-@model function m4_3_2(height, weight, weight_mean)
-    
-    if ismissing(weight_mean)
-        weight_mean = mean(weight)
-    end
-    
-    α ~ Normal(178, 20)
-    β ~ LogNormal(0, 10)
-    μ = α .+ β .* (weight.-weight_mean)
-    σ ~ LogNormal(0, 5) # Changes the prior here
-
-    for i in 1:length(height)
-        height[i] ~ Normal(μ[i], σ)
-    end
-
-end
-
 m4_3_model = m4_3(df.height, df.weight, missing)
 m4_3_2_model = m4_3_2(df.height, df.weight, missing)
 
-# Prior predictive check
+### m4.3
+## Prior predictive check
 
 m4_3_chains_prior = sample(m4_3_model, Prior(), 100)
 m4_3_2_chains_prior = sample(m4_3_2_model, Prior(), 100)
@@ -113,7 +50,7 @@ plot!(p2, ylims = [-100, 400], lab="", title="log(b) ~ N(0, 10)");
 
 plot(p, p2, layout = (1, 2), legend = false)
 
-# Sampling
+## Sampling
 
 # m4_3_chains = sample(m4_3_model, NUTS(), MCMCThreads(), 1000, 4)
 m4_3_chains = sample(m4_3_model, NUTS(0.65), 1000)
@@ -131,7 +68,7 @@ end
 
 plot(p)
 
-# Credibility interval
+## Credibility interval
 # https://stackoverflow.com/questions/62028147/plotting-credible-intervals-in-julia-from-turing-model
 
 res = DataFrame(m4_3_chains)
