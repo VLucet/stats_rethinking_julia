@@ -1,0 +1,4 @@
+Sitemap: https://vlucet.github.io/stats_rethinking_julia/sitemap.xml
+
+User-agent: *
+Disallow:
