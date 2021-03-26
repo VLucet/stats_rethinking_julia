@@ -43,7 +43,7 @@ end
     α ~ Normal(178, 20)
     β ~ LogNormal(0, 1)
     μ = α .+ β .* (weight.-weight_mean)
-    σ ~ LogNormal(0, 5) # Changes the prior here
+    σ ~ LogNormal(0, 5) 
 
     for i in 1:length(height)
         height[i] ~ Normal(μ[i], σ)
@@ -61,7 +61,7 @@ end
     α ~ Normal(178, 20)
     β ~ LogNormal(0, 10)
     μ = α .+ β .* (weight.-weight_mean)
-    σ ~ LogNormal(0, 5) # Changes the prior here
+    σ ~ LogNormal(0, 5) 
 
     for i in 1:length(height)
         height[i] ~ Normal(μ[i], σ)
