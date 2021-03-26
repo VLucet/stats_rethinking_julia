@@ -8,7 +8,7 @@ The website_* must be defined for the RSS to work
 @def website_url   = "https://vlucet.github.io/stats_rethinking_julia/"
 @def authors = "Valentin Lucet (theme from Symbolics.jl)"
 
-@def prepath = "stat_rethinking_julia"
+@def prepath = "stats_rethinking_julia"
 
 @def mintoclevel = 2
 
