@@ -6,7 +6,7 @@
 ~~~
 ### An exploration with Julia and `Turing.jl`
 
-This repository contains the code required to reproduce the figures in Statistical Rethinking using the Julia package Turing.
+This repository contains the code required to reproduce (some of) the figures in Statistical Rethinking using the Julia package Turing.
 
 ### By chapter:
 
