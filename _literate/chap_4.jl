@@ -44,6 +44,8 @@ savefig(figure_4_2, joinpath(@OUTPUT, "figure_4_2.svg")); #src
 
 # \figalt{}{figure_4_2.svg}
 
+# ## Figure 4.3
+
 # ### Importing data
 # 
 # For the rest of the chapter, we use the Howell dataset.
@@ -53,9 +55,17 @@ howell = CSV.read(data_path, DataFrame; delim=';')
 howell = filter(row -> row.age >= 18, howell)
 first(howell, 5)
 
-# ### m4.1
-#
-# We condition the model on the height data, then use the NUTS sampler to 
+# ### Prior predictive simulation
+
+!!!!
+
+# ## Figure 4.4
+
+!!!!
+
+# ## Figure 4.5
+
+# We now condition the model on the height data, then use the NUTS sampler to 
 # produce a single chain.
 
 m4_1_model = m4_1(howell.height)
@@ -88,8 +98,6 @@ savefig(m4_2_chains_plot, joinpath(@OUTPUT, "m4_2_plot.svg")); #src
 m4_2_map_estimate = optimize(m4_2_model, MAP())
 vcov(m4_2_map_estimate)
 
-# ### m4.3
-# 
 # In what follows, we use two different models that only differs by their 
 # prior for β, in the goal of reproduction **figure 4.5 (page 95)**. We first
 # condition the models on the data. Here the missing argument has to do with 
@@ -138,6 +146,8 @@ savefig(figure_4_5, joinpath(@OUTPUT, "figure_4_5.svg")); #src
 
 # \figalt{}{figure_4_5.svg}
 
+# ## Figure 4.6
+
 # #### Sampling
 
 # We can now move onto sampling the posterior. Note that the following code 
@@ -161,6 +171,14 @@ p = scatter(howell.weight, howell.height, xlab="weight", ylab="height", lab="");
 savefig(p, joinpath(@OUTPUT, "figure_4_6.svg")); #src 
 
 # \figalt{}{figure_4_6.svg}
+
+# ## Figure 4.7
+# TODO
+
+# ## Figure 4.8
+# TODO
+
+# ## Figure 4.9
 
 # We can use our posterior samples for credible height nad reproduce the **left 
 # panel of **figure 4.9 (page 106)**.
@@ -201,6 +219,8 @@ savefig(p2, joinpath(@OUTPUT, "figure_4_9_b.svg")); #src
 
 # \figalt{}{figure_4_9_b.svg}
 
+# ## Figure 4.10
+
 # #### Prediction interval
 
 # The prediction interval is a little trickier as it requires to set an empty
@@ -224,3 +244,12 @@ plot!(p3, x_pred, m_pred, ribbon = [lower_pred, upper_pred], xlab="weight", ylab
 savefig(p3, joinpath(@OUTPUT, "figure_4_10.svg")); #src 
 
 # \figalt{}{figure_4_10.svg}
+
+# ## Figure 4.11
+# TODO
+
+# ## Figure 4.12
+# TODO
+
+# ## Figure 4.13
+# TODO
