@@ -56,12 +56,10 @@ howell = filter(row -> row.age >= 18, howell)
 first(howell, 5)
 
 # ### Prior predictive simulation
-
-!!!!
+# TODO
 
 # ## Figure 4.4
-
-!!!!
+# TODO
 
 # ## Figure 4.5
 
