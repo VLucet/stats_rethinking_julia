@@ -1,14 +1,5 @@
 ## STATS RETHINKING ALL MODELS
 
-# Needed libraries
-using CSV
-using DataFrames
-using Turing
-using TuringModels
-using StatsPlots
-using StatsBase
-using Optim
-
 # m4_1
 @model function m4_1(height)
     σ ~ Uniform(0, 50)
