@@ -1,8 +1,8 @@
 # We start first by including the models needed to run the code for this chapter
-# amd setting the seed.
+# and by setting the seed.
 include("src/load_packages.jl");
 include("src/models/chap_4_models.jl");
-Random.seed!(77)
+Random.seed!(77);
 
 # ## Figure 4.2
 
@@ -26,7 +26,7 @@ density!(p_dens, sum_samples, lab = "16 steps",
 density!(rand(Normal(0, std(sum_samples)), 100_000), 
          lab = "N ~ (0, 2.18)", linestyle = :dash);
 
-# Now for the top part of the plotting
+# Now for the top part of the plot.
 
 p_paths = plot()
 for path in 1:1000
@@ -36,7 +36,6 @@ end
 vline!(p_paths, [5], linestyle = :dash, linecolor = :black, lab = "")
 vline!(p_paths, [9], linestyle = :dash, linecolor = :black, lab = "")
 vline!(p_paths, [17], linestyle = :dash, linecolor = :black, lab = "")
-p_paths
 
 figure_4_2 = plot(p_paths, p_dens, layout = (2, 1));
 
