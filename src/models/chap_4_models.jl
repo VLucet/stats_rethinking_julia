@@ -1,4 +1,4 @@
-## STATS RETHINKING ALL MODELS
+## CHAPTER 4 MODELS
 
 # m4_1
 @model function m4_1(height)

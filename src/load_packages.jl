@@ -6,3 +6,4 @@ using StatsPlots
 using StatsBase
 using Optim
 using PrettyPrinting
+using Random

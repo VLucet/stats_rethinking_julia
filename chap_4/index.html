@@ -1,5 +1,39 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/stats_rethinking_julia/libs/highlight/github.min.css"> <link rel=stylesheet  href="/stats_rethinking_julia/css/franklin.css"> <link rel=stylesheet  href="/stats_rethinking_julia/css/poole_hyde.css"> <link rel=stylesheet  href="/stats_rethinking_julia/css/custom.css"> <style> html {font-size: 17px;} .franklin-content {position: relative; padding-left: 8%; padding-right: 5%;} @media (min-width: 940px) { .franklin-content {width: 100%; margin-left: auto; margin-right: auto;} } @media (max-width: 768px) { .franklin-content {padding-left: 6%; padding-right: 6%;} } </style> <link rel=icon  href="/stats_rethinking_julia/assets/favicon.png"> <title>Chapter 4</title> <div class=sidebar > <div class="container sidebar-sticky"> <div class=sidebar-about > </div> <style> @media (min-width: 768px) { /* .sidebar-nav { } */ } .sidebar .container.sidebar-sticky { top: 4rem; } .sidebar-nav .sidebar-nav-item.active { box-sizing: border-box; border-bottom: 1px #f1f1f1 solid; margin-right: -1em; margin-left: -0.5em; padding-left: 0.5em; color: white; font-weight: normal !important; } .sidebar-nav .sidebar-nav-item { color: #cccccc; margin: 0.25em 0; } </style> <nav class=sidebar-nav  style="opacity: 0.9"> <a class="sidebar-nav-item " href="/stats_rethinking_julia/">Home</a> <a class="sidebar-nav-item " href="/stats_rethinking_julia/chap_4/">Chapter 4</a> </nav> <div class=bottom-sidebar > <a href="https://github.com/VLucet/stats_rethinking_julia">Go to GitHub repository &rarr;</a> <br> <br> <a href="https://julialang.org/"><img src="https://raw.githubusercontent.com/JuliaLang/julia-logo-graphics/master/images/julia-logo-dark.svg" height=32  style="display: inline-block; margin-bottom: -8px; opacity: 0.7"> powered.</a> </div> </div> </div> <div class="content container"> <div class=franklin-content > <h1 class=sidebar-title ><a href="/stats_rethinking_julia/">Geocentric<span style="opacity:0.4"> models</span></a></h1> <p>We start first by including the models needed to run the code for this chapter</p> <pre><code class=language-julia >include&#40;&quot;src/load_packages.jl&quot;&#41;;
-include&#40;&quot;src/models/chap_4_models.jl&quot;&#41;;</code></pre> <h3 id=importing_data ><a href="#importing_data" class=header-anchor >Importing data</a></h3> <p>Here we use the Howell dataset.</p> <pre><code class=language-julia >data_path &#61; joinpath&#40;TuringModels.project_root, &quot;data&quot;, &quot;Howell1.csv&quot;&#41;
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/stats_rethinking_julia/libs/highlight/github.min.css"> <link rel=stylesheet  href="/stats_rethinking_julia/css/franklin.css"> <link rel=stylesheet  href="/stats_rethinking_julia/css/poole_hyde.css"> <link rel=stylesheet  href="/stats_rethinking_julia/css/custom.css"> <style> html {font-size: 17px;} .franklin-content {position: relative; padding-left: 8%; padding-right: 5%;} @media (min-width: 940px) { .franklin-content {width: 100%; margin-left: auto; margin-right: auto;} } @media (max-width: 768px) { .franklin-content {padding-left: 6%; padding-right: 6%;} } </style> <link rel=icon  href="/stats_rethinking_julia/assets/favicon.png"> <title>Chapter 4</title> <div class=sidebar > <div class="container sidebar-sticky"> <div class=sidebar-about > </div> <style> @media (min-width: 768px) { /* .sidebar-nav { } */ } .sidebar .container.sidebar-sticky { top: 4rem; } .sidebar-nav .sidebar-nav-item.active { box-sizing: border-box; border-bottom: 1px #f1f1f1 solid; margin-right: -1em; margin-left: -0.5em; padding-left: 0.5em; color: white; font-weight: normal !important; } .sidebar-nav .sidebar-nav-item { color: #cccccc; margin: 0.25em 0; } </style> <nav class=sidebar-nav  style="opacity: 0.9"> <a class="sidebar-nav-item " href="/stats_rethinking_julia/">Home</a> <a class="sidebar-nav-item " href="/stats_rethinking_julia/chap_4/">Chapter 4</a> </nav> <div class=bottom-sidebar > <a href="https://github.com/VLucet/stats_rethinking_julia">Go to GitHub repository &rarr;</a> <br> <br> <a href="https://julialang.org/"><img src="https://raw.githubusercontent.com/JuliaLang/julia-logo-graphics/master/images/julia-logo-dark.svg" height=32  style="display: inline-block; margin-bottom: -8px; opacity: 0.7"> powered.</a> </div> </div> </div> <div class="content container"> <div class=franklin-content > <h1 class=sidebar-title ><a href="/stats_rethinking_julia/">Geocentric<span style="opacity:0.4"> models</span></a></h1> <p>We start first by including the models needed to run the code for this chapter amd setting the seed.</p> <pre><code class=language-julia >include&#40;&quot;src/load_packages.jl&quot;&#41;;
+include&#40;&quot;src/models/chap_4_models.jl&quot;&#41;;
+Random.seed&#33;&#40;77&#41;</code></pre><pre><code class=plaintext >MersenneTwister(77)</code></pre>
+<h2 id=figure_42 ><a href="#figure_42" class=header-anchor >Figure 4.2</a></h2>
+<p>In Julia, we rely on the package <code>Distributions.jl</code> to sample from a given distribution. Here we sample 16 times from a uniform distribution U ~ &#40;-1, 1&#41;. We now plot the bottom part of <strong>figure 4.2 &#40;page 73&#41;</strong>.</p>
+<pre><code class=language-julia >U &#61; Uniform&#40;-1,1&#41;
+samples &#61; &#91;rand&#40;U, 16&#41; for i in 1:1000&#93;
+
+sum_samples &#61; sum.&#40;samples&#41;
+sum_samples_4 &#61; sum.&#40;&#91;samples&#91;i&#93;&#91;1:4&#93; for i in 1:1000&#93;&#41;
+sum_samples_8 &#61; sum.&#40;&#91;samples&#91;i&#93;&#91;1:8&#93; for i in 1:1000&#93;&#41;
+
+p_dens &#61; density&#40;sum_samples_4, lab &#61; &quot;4 steps&quot;,
+                 linecolor &#61; :blue, linealpha &#61; 0.3&#41;
+density&#33;&#40;p_dens, sum_samples_8, lab &#61; &quot;8 steps&quot;,
+         linecolor &#61; :red, linealpha &#61; 0.3&#41;
+density&#33;&#40;p_dens, sum_samples, lab &#61; &quot;16 steps&quot;,
+         linecolor &#61; :green, linealpha &#61; 0.3&#41;
+density&#33;&#40;rand&#40;Normal&#40;0, std&#40;sum_samples&#41;&#41;, 100_000&#41;,
+         lab &#61; &quot;N ~ &#40;0, 2.18&#41;&quot;, linestyle &#61; :dash&#41;;</code></pre>
+<p>Now for the top part of the plotting</p>
+<pre><code class=language-julia >p_paths &#61; plot&#40;&#41;
+for path in 1:1000
+    plot&#33;&#40;p_paths, 1:17, insert&#33;&#40;cumsum&#40;samples&#91;path&#93;&#41;, 1, 0&#41;, lab &#61; &quot;&quot;,
+          linecolor&#61; :darkblue, linealpha &#61; 0.1&#41;
+end
+vline&#33;&#40;p_paths, &#91;5&#93;, linestyle &#61; :dash, linecolor &#61; :black, lab &#61; &quot;&quot;&#41;
+vline&#33;&#40;p_paths, &#91;9&#93;, linestyle &#61; :dash, linecolor &#61; :black, lab &#61; &quot;&quot;&#41;
+vline&#33;&#40;p_paths, &#91;17&#93;, linestyle &#61; :dash, linecolor &#61; :black, lab &#61; &quot;&quot;&#41;
+p_paths
+
+figure_4_2 &#61; plot&#40;p_paths, p_dens, layout &#61; &#40;2, 1&#41;&#41;;</code></pre>
+<img src="/stats_rethinking_julia/assets/chap_4/code/output/figure_4_2.svg" alt="">
+<h3 id=importing_data ><a href="#importing_data" class=header-anchor >Importing data</a></h3>
+<p>For the rest of the chapter, we use the Howell dataset.</p>
+<pre><code class=language-julia >data_path &#61; joinpath&#40;TuringModels.project_root, &quot;data&quot;, &quot;Howell1.csv&quot;&#41;
 howell &#61; CSV.read&#40;data_path, DataFrame; delim&#61;&#39;;&#39;&#41;
 howell &#61; filter&#40;row -&gt; row.age &gt;&#61; 18, howell&#41;
 first&#40;howell, 5&#41;</code></pre><pre><code class=plaintext >5×4 DataFrame
@@ -10,23 +44,43 @@ first&#40;howell, 5&#41;</code></pre><pre><code class=plaintext >5×4 DataFrame
    2 │ 139.7    36.4858     63.0      0
    3 │ 136.525  31.8648     65.0      0
    4 │ 156.845  53.0419     41.0      1
-   5 │ 145.415  41.2769     51.0      0</code></pre> <h3 id=m41 ><a href="#m41" class=header-anchor >m4.1</a></h3> <p>We condition the model on the height data, then use the NUTS sampler to produce a single chain.</p> <pre><code class=language-julia >m4_1_model &#61; m4_1&#40;howell.height&#41;
+   5 │ 145.415  41.2769     51.0      0</code></pre>
+<h3 id=m41 ><a href="#m41" class=header-anchor >m4.1</a></h3>
+<p>We condition the model on the height data, then use the NUTS sampler to produce a single chain.</p>
+<pre><code class=language-julia >m4_1_model &#61; m4_1&#40;howell.height&#41;
 m4_1_chains &#61; sample&#40;m4_1_model, NUTS&#40;0.65&#41;, 1000&#41;
-m4_1_chains_plot &#61; plot&#40;m4_1_chains&#41;</code></pre> <img src="/stats_rethinking_julia/assets/chap_4/code/output/m4_1_plot.svg" alt="Chains for model 4_1"> <p>We can use <code>optimize&#40;&#41;</code> in combination with <code>MAP&#40;&#41;</code> to find the MAP, and we can print the variance-covariance matrix, just like in the book.</p> <pre><code class=language-julia >m4_1_map_estimate &#61; optimize&#40;m4_1_model, MAP&#40;&#41;&#41;
+m4_1_chains_plot &#61; plot&#40;m4_1_chains&#41;</code></pre>
+<img src="/stats_rethinking_julia/assets/chap_4/code/output/m4_1_plot.svg" alt="Chains for model 4_1">
+<p>We can use <code>optimize&#40;&#41;</code> in combination with <code>MAP&#40;&#41;</code> to find the MAP, and we can print the variance-covariance matrix, just like in the book.</p>
+<pre><code class=language-julia >m4_1_map_estimate &#61; optimize&#40;m4_1_model, MAP&#40;&#41;&#41;
 vcov&#40;m4_1_map_estimate&#41;</code></pre><pre><code class=plaintext >2×2 Named Matrix{Float64}
 A ╲ B │          :σ           :μ
 ──────┼─────────────────────────
 :σ    │   0.0849058  0.000218032
-:μ    │ 0.000218032      0.16974</code></pre> <h3 id=m42 ><a href="#m42" class=header-anchor >m4.2</a></h3> <p>We conduct a similar analysis for the second model which uses a different prior on μ.</p> <pre><code class=language-julia >m4_2_model &#61; m4_2&#40;howell.height&#41;
+:μ    │ 0.000218032      0.16974</code></pre>
+<h3 id=m42 ><a href="#m42" class=header-anchor >m4.2</a></h3>
+<p>We conduct a similar analysis for the second model which uses a different prior on μ.</p>
+<pre><code class=language-julia >m4_2_model &#61; m4_2&#40;howell.height&#41;
 m4_2_chains &#61; sample&#40;m4_2_model, NUTS&#40;0.65&#41;, 1000&#41;
-m4_2_chains_plot &#61;plot&#40;m4_2_chains&#41;</code></pre> <img src="/stats_rethinking_julia/assets/chap_4/code/output/m4_2_plot.svg" alt="Chains for model 4_2"> <p>Similarly we get the MAP and the variance-covariance matrix.</p> <pre><code class=language-julia >m4_2_map_estimate &#61; optimize&#40;m4_2_model, MAP&#40;&#41;&#41;
+m4_2_chains_plot &#61;plot&#40;m4_2_chains&#41;</code></pre>
+<img src="/stats_rethinking_julia/assets/chap_4/code/output/m4_2_plot.svg" alt="Chains for model 4_2">
+<p>Similarly we get the MAP and the variance-covariance matrix.</p>
+<pre><code class=language-julia >m4_2_map_estimate &#61; optimize&#40;m4_2_model, MAP&#40;&#41;&#41;
 vcov&#40;m4_2_map_estimate&#41;</code></pre><pre><code class=plaintext >2×2 Named Matrix{Float64}
 A ╲ B │         :σ          :μ
 ──────┼───────────────────────
 :σ    │   0.862899  0.00953452
-:μ    │ 0.00953452   0.0100471</code></pre> <h3 id=m43 ><a href="#m43" class=header-anchor >m4.3</a></h3> <p>In what follows, we use two different models that only differs by their prior for β, in the goal of reproduction <strong>figure 4.5 &#40;page 95&#41;</strong>. We first condition the models on the data. Here the missing argument has to do with centering of the value and is useful for later when we use the model for predictions.</p> <pre><code class=language-julia >m4_3_model &#61; m4_3&#40;howell.height, howell.weight, missing&#41;
-m4_3_2_model &#61; m4_3_2&#40;howell.height, howell.weight, missing&#41;;</code></pre> <h4 id=prior_predictive_check ><a href="#prior_predictive_check" class=header-anchor >Prior predictive check</a></h4> <p>We draw 100 samples from the Prior distributions.</p> <pre><code class=language-julia >m4_3_chains_prior &#61; sample&#40;m4_3_model, Prior&#40;&#41;, 100&#41;
-m4_3_2_chains_prior &#61; sample&#40;m4_3_2_model, Prior&#40;&#41;, 100&#41;;</code></pre> <p>We can now reproduce the figure, first with the left plot for the first prior.</p> <pre><code class=language-julia >xi &#61; minimum&#40;howell.weight&#41;:0.1:maximum&#40;howell.weight&#41;
+:μ    │ 0.00953452   0.0100471</code></pre>
+<h3 id=m43 ><a href="#m43" class=header-anchor >m4.3</a></h3>
+<p>In what follows, we use two different models that only differs by their prior for β, in the goal of reproduction <strong>figure 4.5 &#40;page 95&#41;</strong>. We first condition the models on the data. Here the missing argument has to do with centering of the value and is useful for later when we use the model for predictions.</p>
+<pre><code class=language-julia >m4_3_model &#61; m4_3&#40;howell.height, howell.weight, missing&#41;
+m4_3_2_model &#61; m4_3_2&#40;howell.height, howell.weight, missing&#41;;</code></pre>
+<h4 id=prior_predictive_check ><a href="#prior_predictive_check" class=header-anchor >Prior predictive check</a></h4>
+<p>We draw 100 samples from the Prior distributions.</p>
+<pre><code class=language-julia >m4_3_chains_prior &#61; sample&#40;m4_3_model, Prior&#40;&#41;, 100&#41;
+m4_3_2_chains_prior &#61; sample&#40;m4_3_2_model, Prior&#40;&#41;, 100&#41;;</code></pre>
+<p>We can now reproduce the figure, first with the left plot for the first prior.</p>
+<pre><code class=language-julia >xi &#61; minimum&#40;howell.weight&#41;:0.1:maximum&#40;howell.weight&#41;
 p &#61; plot&#40;&#41;;
 
 for row in 1:length&#40;m4_3_chains_prior&#41;
@@ -36,7 +90,9 @@ end
 
 hline&#33;&#40;p, &#91;0&#93;, ls&#61;:dash, color&#61;&quot;#000000&quot;, lab&#61;&quot;&quot;&#41;;
 hline&#33;&#40;p, &#91;272&#93;, color&#61;&quot;#000000&quot;, lab&#61;&quot;&quot;&#41;;
-plot&#33;&#40;p, ylims &#61; &#91;-100, 400&#93;, title&#61;&quot;log&#40;b&#41; ~ N&#40;0, 1&#41;&quot;, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;;</code></pre> <p>Then with the right plot for the other prior.</p> <pre><code class=language-julia >p2 &#61; plot&#40;&#41;;
+plot&#33;&#40;p, ylims &#61; &#91;-100, 400&#93;, title&#61;&quot;log&#40;b&#41; ~ N&#40;0, 1&#41;&quot;, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;;</code></pre>
+<p>Then with the right plot for the other prior.</p>
+<pre><code class=language-julia >p2 &#61; plot&#40;&#41;;
 
 for row in 1:length&#40;m4_3_2_chains_prior&#41;
     yi &#61; m4_3_2_chains_prior&#91;:α&#93;&#91;row&#93; .&#43; m4_3_2_chains_prior&#91;:β&#93;&#91;row&#93; .* &#40;xi .- mean&#40;howell.weight&#41;&#41;
@@ -47,14 +103,22 @@ hline&#33;&#40;p2, &#91;0&#93;, ls&#61;:dash, color&#61;&quot;#000000&quot;, lab
 hline&#33;&#40;p2, &#91;272&#93;, color&#61;&quot;#000000&quot;, lab&#61;&quot;&quot;&#41;;
 plot&#33;&#40;p2, ylims &#61; &#91;-100, 400&#93;, title&#61;&quot;log&#40;b&#41; ~ N&#40;0, 10&#41;&quot;, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;;
 
-figure_4_5 &#61; plot&#40;p, p2, layout &#61; &#40;1, 2&#41;, legend &#61; false&#41;</code></pre> <img src="/stats_rethinking_julia/assets/chap_4/code/output/figure_4_5.svg" alt=""> <h4 id=sampling ><a href="#sampling" class=header-anchor >Sampling</a></h4> <p>We can now move onto sampling the posterior. Note that the following code samples only one chain using a NUTS sampler, but Turing has other samplers, for instance the <code>MCMC&#40;&#41;</code> sampler, and can be used as such: <code>m4_3_chains &#61; sample&#40;m4_3_model, NUTS&#40;&#41;, MCMCThreads&#40;&#41;, 1000, 4&#41;</code> &#40;this samples 4 chains&#41;.</p> <pre><code class=language-julia >m4_3_chains &#61; sample&#40;m4_3_model, NUTS&#40;0.65&#41;, 1000&#41;
-m4_3_chains_plot &#61; plot&#40;m4_3_chains&#41;</code></pre> <img src="/stats_rethinking_julia/assets/chap_4/code/output/m4_3_plot.svg" alt="Chains for model 4_3"> <pre><code class=language-julia >m4_3_map_estimate &#61; optimize&#40;m4_3_model, MAP&#40;&#41;&#41;
+figure_4_5 &#61; plot&#40;p, p2, layout &#61; &#40;1, 2&#41;, legend &#61; false&#41;</code></pre>
+<img src="/stats_rethinking_julia/assets/chap_4/code/output/figure_4_5.svg" alt="">
+<h4 id=sampling ><a href="#sampling" class=header-anchor >Sampling</a></h4>
+<p>We can now move onto sampling the posterior. Note that the following code samples only one chain using a NUTS sampler, but Turing has other samplers, for instance the <code>MCMC&#40;&#41;</code> sampler, and can be used as such: <code>m4_3_chains &#61; sample&#40;m4_3_model, NUTS&#40;&#41;, MCMCThreads&#40;&#41;, 1000, 4&#41;</code> &#40;this samples 4 chains&#41;.</p>
+<pre><code class=language-julia >m4_3_chains &#61; sample&#40;m4_3_model, NUTS&#40;0.65&#41;, 1000&#41;
+m4_3_chains_plot &#61; plot&#40;m4_3_chains&#41;</code></pre>
+<img src="/stats_rethinking_julia/assets/chap_4/code/output/m4_3_plot.svg" alt="Chains for model 4_3">
+<pre><code class=language-julia >m4_3_map_estimate &#61; optimize&#40;m4_3_model, MAP&#40;&#41;&#41;
 vcov&#40;m4_3_map_estimate&#41;</code></pre><pre><code class=plaintext >3×3 Named Matrix{Float64}
 A ╲ B │          :α           :β           :σ
 ──────┼──────────────────────────────────────
 :α    │   0.0728459  -4.20611e-8   6.11187e-5
 :β    │ -4.20611e-8   0.00175229  -2.49936e-5
-:σ    │  6.11187e-5  -2.49936e-5     0.036318</code></pre> <p>Here is a plot of the data, similar to <strong>figure 4.6 &#40;page 101&#41;</strong>.</p> <pre><code class=language-julia >p &#61; scatter&#40;howell.weight, howell.height, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;;</code></pre>
+:σ    │  6.11187e-5  -2.49936e-5     0.036318</code></pre>
+<p>Here is a plot of the data, similar to <strong>figure 4.6 &#40;page 101&#41;</strong>.</p>
+<pre><code class=language-julia >p &#61; scatter&#40;howell.weight, howell.height, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;;</code></pre>
 <img src="/stats_rethinking_julia/assets/chap_4/code/output/figure_4_6.svg" alt="">
 <p>We can use our posterior samples for credible height nad reproduce the <strong>left panel of **figure 4.9 &#40;page 106&#41;</strong>.</p>
 <pre><code class=language-julia >for row in 1:length&#40;m4_3_chains&#41;

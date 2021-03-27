@@ -1,5 +1,14 @@
 # This file was generated, do not modify it. # hide
-m4_1_model = m4_1(howell.height)
-m4_1_chains = sample(m4_1_model, NUTS(0.65), 1000)
-m4_1_chains_plot = plot(m4_1_chains)
-savefig(m4_1_chains_plot, joinpath(@OUTPUT, "m4_1_plot.svg")); #src
+p_paths = plot()
+for path in 1:1000
+    plot!(p_paths, 1:17, insert!(cumsum(samples[path]), 1, 0), lab = "",
+          linecolor= :darkblue, linealpha = 0.1)
+end
+vline!(p_paths, [5], linestyle = :dash, linecolor = :black, lab = "")
+vline!(p_paths, [9], linestyle = :dash, linecolor = :black, lab = "")
+vline!(p_paths, [17], linestyle = :dash, linecolor = :black, lab = "")
+p_paths
+
+figure_4_2 = plot(p_paths, p_dens, layout = (2, 1));
+
+savefig(figure_4_2, joinpath(@OUTPUT, "figure_4_2.svg")); #src

@@ -2,6 +2,37 @@
 
 include("src/load_packages.jl");
 include("src/models/chap_4_models.jl");
+Random.seed!(77)
+
+U = Uniform(-1,1)
+samples = [rand(U, 16) for i in 1:1000]
+
+sum_samples = sum.(samples)
+sum_samples_4 = sum.([samples[i][1:4] for i in 1:1000])
+sum_samples_8 = sum.([samples[i][1:8] for i in 1:1000])
+
+p_dens = density(sum_samples_4, lab = "4 steps",
+                 linecolor = :blue, linealpha = 0.3)
+density!(p_dens, sum_samples_8, lab = "8 steps",
+         linecolor = :red, linealpha = 0.3)
+density!(p_dens, sum_samples, lab = "16 steps",
+         linecolor = :green, linealpha = 0.3)
+density!(rand(Normal(0, std(sum_samples)), 100_000),
+         lab = "N ~ (0, 2.18)", linestyle = :dash);
+
+p_paths = plot()
+for path in 1:1000
+    plot!(p_paths, 1:17, insert!(cumsum(samples[path]), 1, 0), lab = "",
+          linecolor= :darkblue, linealpha = 0.1)
+end
+vline!(p_paths, [5], linestyle = :dash, linecolor = :black, lab = "")
+vline!(p_paths, [9], linestyle = :dash, linecolor = :black, lab = "")
+vline!(p_paths, [17], linestyle = :dash, linecolor = :black, lab = "")
+p_paths
+
+figure_4_2 = plot(p_paths, p_dens, layout = (2, 1));
+
+savefig(figure_4_2, joinpath(@OUTPUT, "figure_4_2.svg")); #src
 
 data_path = joinpath(TuringModels.project_root, "data", "Howell1.csv")
 howell = CSV.read(data_path, DataFrame; delim=';')
