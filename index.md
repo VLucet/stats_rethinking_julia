@@ -1,7 +1,9 @@
 @def title = "Statistical Rethinking in Julia"
 @def tags = ["syntax", "code"]
 
-# Statistical Rethinking
+~~~
+<h1 class="sidebar-title"><a href="/">Statistical<span style="opacity:0.4"> Rethinking</span></a></h1>
+~~~
 ### An exploration with Julia and `Turing.jl`
 
 This repository contains the code required to reproduce the figures in Statistical Rethinking using the Julia package Turing.
