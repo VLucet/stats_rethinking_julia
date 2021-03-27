@@ -87,7 +87,12 @@ savefig(figure_4_3, joinpath(@OUTPUT, "figure_4_3.svg")); #src
 # \figalt{}{figure_4_3.svg}
 
 # ## Figure 4.4
-# TODO
+
+# ### Posterior grid approximation
+
+μ_vec = range(150, 160, length = 100)
+σ_vec = range(7, 9, length = 100)
+post_grid = reduce(vcat, collect(Iterators.product(μ_vec, σ_vec)))
 
 # ## Figure 4.5
 
