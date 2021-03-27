@@ -1,1 +1,1 @@
-MersenneTwister(77)
+nothing

@@ -7,7 +7,6 @@ end
 vline!(p_paths, [5], linestyle = :dash, linecolor = :black, lab = "")
 vline!(p_paths, [9], linestyle = :dash, linecolor = :black, lab = "")
 vline!(p_paths, [17], linestyle = :dash, linecolor = :black, lab = "")
-p_paths
 
 figure_4_2 = plot(p_paths, p_dens, layout = (2, 1));
 

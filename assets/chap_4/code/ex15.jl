@@ -1,3 +1,4 @@
 # This file was generated, do not modify it. # hide
-p = scatter(howell.weight, howell.height, xlab="weight", ylab="height", lab="");
-savefig(p, joinpath(@OUTPUT, "figure_4_6.svg")); #src
+m4_3_chains = sample(m4_3_model, NUTS(0.65), 1000)
+m4_3_chains_plot = plot(m4_3_chains)
+savefig(m4_3_chains_plot, joinpath(@OUTPUT, "m4_3_plot.svg")); #src
