@@ -245,7 +245,7 @@ function predict_interval(lower_bound, upper_bound, test, chains, var)
     return(lower_pred, m_pred, upper_pred)
 end
 
-predict_interval_4_3 = predict_interval(m4_3_test, m4_3_chains, "height")
+predict_interval_4_3 = predict_interval(0.1, 0.9, m4_3_test, m4_3_chains, "height")
 
 p3 = scatter(howell.weight, howell.height, lab="")
 plot!(p3, xi, compat_interval_4_3[2],
