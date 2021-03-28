@@ -145,11 +145,11 @@ m4_3_chains_plot &#61; plot&#40;m4_3_chains&#41;</code></pre>
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/m4_3_plot.svg" alt="Chains for model 4_3">
 <pre><code class=language-julia >m4_3_map_estimate &#61; optimize&#40;m4_3_model, MAP&#40;&#41;&#41;
 vcov&#40;m4_3_map_estimate&#41;</code></pre><pre><code class=plaintext >3×3 Named Matrix{Float64}
-A ╲ B │          :α           :β           :σ
-──────┼──────────────────────────────────────
-:α    │   0.0728459  -4.20611e-8   6.11187e-5
-:β    │ -4.20611e-8   0.00175229  -2.49936e-5
-:σ    │  6.11187e-5  -2.49936e-5     0.036318</code></pre>
+A ╲ B │           :α            :β            :σ
+──────┼─────────────────────────────────────────
+:α    │    0.0710102  -5.60586e-88    1.91173e-5
+:β    │ -5.60586e-88   1.38389e-85  -3.37388e-85
+:σ    │   1.91173e-5  -3.37388e-85     0.0115057</code></pre>
 <p>Here is a plot of the data, similar to <strong>figure 4.6 &#40;page 101&#41;</strong>.</p>
 <pre><code class=language-julia >p &#61; scatter&#40;howell.weight, howell.height, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;;</code></pre>
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_6.svg" alt="">
@@ -227,7 +227,8 @@ plot&#33;&#40;p2, xi, m, ribbon &#61; &#91;lower, upper&#93;, xlab&#61;&quot;wei
 <h4 id=prediction_interval ><a href="#prediction_interval" class=header-anchor >Prediction interval</a></h4>
 <p>The prediction interval is a little trickier as it requires to set an empty vector in lieu of the weight data. We this we can reproduce <strong>figure 4.10 &#40;page 109&#41;</strong>.</p>
 <pre><code class=language-julia >x_pred &#61; xi
-m_test &#61; m4_3&#40;Vector&#123;Union&#123;Missing, Float64&#125;&#125;&#40;undef, length&#40;x_pred&#41;&#41;, hcat&#40;x_pred&#41;, mean&#40;howell.weight&#41;&#41;;
+m_test &#61; m4_3&#40;Vector&#123;Union&#123;Missing, Float64&#125;&#125;&#40;undef, length&#40;x_pred&#41;&#41;,
+              hcat&#40;x_pred&#41;, mean&#40;howell.weight&#41;&#41;;
 predictions &#61; predict&#40;m_test, m4_3_chains&#41;
 
 pred_array &#61; Array&#40;group&#40;predictions, :height&#41;&#41;
@@ -238,10 +239,20 @@ upper_pred &#61; &#91;q&#91;2&#93; - m for &#40;q, m&#41; in zip&#40;quantiles_p
 
 p3 &#61; scatter&#40;howell.weight, howell.height, lab&#61;&quot;&quot;&#41;
 plot&#33;&#40;p3, xi, m, ribbon &#61; &#91;lower, upper&#93;, lab&#61;&quot;&quot;&#41;
-plot&#33;&#40;p3, x_pred, m_pred, ribbon &#61; &#91;lower_pred, upper_pred&#93;, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;</code></pre>
+plot&#33;&#40;p3, x_pred, m_pred, ribbon &#61; &#91;lower_pred, upper_pred&#93;,
+      xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;</code></pre>
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_10.svg" alt="">
 <h2 id=figure_411 ><a href="#figure_411" class=header-anchor >Figure 4.11</a></h2>
-<p>TODO</p>
+<p>For what follows, let&#39;s reload the data with all rows. We also standardize weights and create a polynormial variable for weights.</p>
+<pre><code class=language-julia >howell &#61; CSV.read&#40;data_path, DataFrame; delim&#61;&#39;;&#39;&#41;;
+howell.weight_s &#61; &#40;howell.weight .- mean&#40;howell.weight&#41;&#41;./std&#40;howell.weight&#41;
+howell.weight_s2 &#61; howell.weight_s.^2;</code></pre>
+<p>We can now condition the model on data and sample.</p>
+<pre><code class=language-julia >m4_5_model &#61; m4_5&#40;howell.height, howell.weight_s, howell.weight_s2&#41;
+m4_5_chains &#61; sample&#40;m4_5_model, NUTS&#40;0.65&#41;, 1000&#41;
+
+m4_5_chains_plot &#61; plot&#40;m4_5_chains&#41;;</code></pre>
+<img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/m4_5_plot.svg" alt="Chains for model 4_5">
 <h2 id=figure_412 ><a href="#figure_412" class=header-anchor >Figure 4.12</a></h2>
 <p>TODO</p>
 <h2 id=figure_413 ><a href="#figure_413" class=header-anchor >Figure 4.13</a></h2>

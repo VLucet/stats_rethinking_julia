@@ -2,9 +2,10 @@
 @model function other_m4_3(height, weight)
 
     α ~ Normal(178, 20)
-    β ~ LogNormal(0, 1)
+    β ~ LogNormal(0, 10)
+    σ ~ Uniform(0, 50)
+
     μ = α .+ β .* (weight.-mean(weight))
-    σ ~ LogNormal(0, 50)
 
     height .~ Normal.(μ, σ)
 

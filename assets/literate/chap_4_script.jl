@@ -219,7 +219,8 @@ plot!(p2, xi, m, ribbon = [lower, upper], xlab="weight", ylab="height", lab="")
 savefig(p2, joinpath(@OUTPUT, "figure_4_9_b.svg")); #src
 
 x_pred = xi
-m_test = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred)), hcat(x_pred), mean(howell.weight));
+m_test = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred)),
+              hcat(x_pred), mean(howell.weight));
 predictions = predict(m_test, m4_3_chains)
 
 pred_array = Array(group(predictions, :height))
@@ -230,7 +231,18 @@ upper_pred = [q[2] - m for (q, m) in zip(quantiles_pred, m_pred)]
 
 p3 = scatter(howell.weight, howell.height, lab="")
 plot!(p3, xi, m, ribbon = [lower, upper], lab="")
-plot!(p3, x_pred, m_pred, ribbon = [lower_pred, upper_pred], xlab="weight", ylab="height", lab="")
+plot!(p3, x_pred, m_pred, ribbon = [lower_pred, upper_pred],
+      xlab="weight", ylab="height", lab="")
 
 savefig(p3, joinpath(@OUTPUT, "figure_4_10.svg")); #src
+
+howell = CSV.read(data_path, DataFrame; delim=';');
+howell.weight_s = (howell.weight .- mean(howell.weight))./std(howell.weight)
+howell.weight_s2 = howell.weight_s.^2;
+
+m4_5_model = m4_5(howell.height, howell.weight_s, howell.weight_s2)
+m4_5_chains = sample(m4_5_model, NUTS(0.65), 1000)
+
+m4_5_chains_plot = plot(m4_5_chains);
+savefig(m4_5_chains_plot, joinpath(@OUTPUT, "m4_5_plot.svg")); #src
 
