@@ -105,15 +105,50 @@ savefig(figure_4_3, joinpath(@OUTPUT, "figure_4_3.svg")); #src
 ```julia:ex6
 μ_vec = range(150, 160, length = 100)
 σ_vec = range(7, 9, length = 100)
+
 post_grid = reduce(vcat, collect(Iterators.product(μ_vec, σ_vec)))
+post_grid_dist = [Normal(t[1], t[2]) for t in post_grid]
+log_likelihood = sum.([log.(pdf.(d, howell.height)) for d in post_grid_dist])
+
+all_μ = [p[1] for p in post_grid]
+all_σ = [p[2] for p in post_grid]
+
+post_prod = log_likelihood .+ log.(pdf(Normal(178, 20), all_μ))
+                           .+ log.(pdf(Uniform(0, 50), all_σ))
+post_prob = exp.(post_prod .- maximum(post_prod));
 ```
+
+We can make a contour plot of the posterior:
+
+```julia:ex7
+contour_plot = contour(μ_vec, σ_vec, post_prob)
+savefig(contour_plot, joinpath(@OUTPUT, "contour_plot.svg")); #src
+```
+
+\figalt{}{contour_plot.svg}
+
+Let's now sample from that posterior
+
+```julia:ex8
+sample_rows = sample(collect(1:size(post_grid)[1]), Weights(post_prob),
+                     10_000, replace = true)
+sample_μ = all_μ[sample_rows]
+sample_σ = all_σ[sample_rows]
+
+figure_4_4 = scatter(sample_μ, sample_σ, lab = "", aspect_ratio = 1.5,
+                     xlab = "μ", ylab = "σ", markeralpha=0.1, markersize=3);
+
+savefig(figure_4_4, joinpath(@OUTPUT, "figure_4_4.svg")); #src
+```
+
+\figalt{}{figure_4_4.svg}
 
 ## Figure 4.5
 
 We now condition the model on the height data, then use the NUTS sampler to
 produce a single chain.
 
-```julia:ex7
+```julia:ex9
 m4_1_model = m4_1(howell.height)
 m4_1_chains = sample(m4_1_model, NUTS(0.65), 1000)
 m4_1_chains_plot = plot(m4_1_chains)
@@ -125,7 +160,7 @@ savefig(m4_1_chains_plot, joinpath(@OUTPUT, "m4_1_plot.svg")); #src
 We can use `optimize()` in combination with `MAP()` to find the MAP, and
 we can print the variance-covariance matrix, just like in the book.
 
-```julia:ex8
+```julia:ex10
 m4_1_map_estimate = optimize(m4_1_model, MAP())
 vcov(m4_1_map_estimate)
 ```
@@ -135,7 +170,7 @@ vcov(m4_1_map_estimate)
 We conduct a similar analysis for the second model which uses a different
 prior on μ.
 
-```julia:ex9
+```julia:ex11
 m4_2_model = m4_2(howell.height)
 m4_2_chains = sample(m4_2_model, NUTS(0.65), 1000)
 m4_2_chains_plot =plot(m4_2_chains)
@@ -146,7 +181,7 @@ savefig(m4_2_chains_plot, joinpath(@OUTPUT, "m4_2_plot.svg")); #src
 
 Similarly we get the MAP and the variance-covariance matrix.
 
-```julia:ex10
+```julia:ex12
 m4_2_map_estimate = optimize(m4_2_model, MAP())
 vcov(m4_2_map_estimate)
 ```
@@ -157,7 +192,7 @@ condition the models on the data. Here the missing argument has to do with
 centering of the value and is useful for later when we use the model for
 predictions.
 
-```julia:ex11
+```julia:ex13
 m4_3_model = m4_3(howell.height, howell.weight, missing)
 m4_3_2_model = m4_3_2(howell.height, howell.weight, missing);
 ```
@@ -166,14 +201,14 @@ m4_3_2_model = m4_3_2(howell.height, howell.weight, missing);
 
 We draw 100 samples from the Prior distributions.
 
-```julia:ex12
+```julia:ex14
 m4_3_chains_prior = sample(m4_3_model, Prior(), 100)
 m4_3_2_chains_prior = sample(m4_3_2_model, Prior(), 100);
 ```
 
 We can now reproduce the figure, first with the left plot for the first prior.
 
-```julia:ex13
+```julia:ex15
 xi = minimum(howell.weight):0.1:maximum(howell.weight)
 p = plot();
 
@@ -189,7 +224,7 @@ plot!(p, ylims = [-100, 400], title="log(b) ~ N(0, 1)", xlab="weight", ylab="hei
 
 Then with the right plot for the other prior.
 
-```julia:ex14
+```julia:ex16
 p2 = plot();
 
 for row in 1:length(m4_3_2_chains_prior)
@@ -217,7 +252,7 @@ for instance the `MCMC()` sampler, and can be used as such:
 `m4_3_chains = sample(m4_3_model, NUTS(), MCMCThreads(), 1000, 4)` (this
 samples 4 chains).
 
-```julia:ex15
+```julia:ex17
 m4_3_chains = sample(m4_3_model, NUTS(0.65), 1000)
 m4_3_chains_plot = plot(m4_3_chains)
 savefig(m4_3_chains_plot, joinpath(@OUTPUT, "m4_3_plot.svg")); #src
@@ -225,14 +260,14 @@ savefig(m4_3_chains_plot, joinpath(@OUTPUT, "m4_3_plot.svg")); #src
 
 \figalt{Chains for model 4_3}{m4_3_plot.svg}
 
-```julia:ex16
+```julia:ex18
 m4_3_map_estimate = optimize(m4_3_model, MAP())
 vcov(m4_3_map_estimate)
 ```
 
 Here is a plot of the data, similar to **figure 4.6 (page 101)**.
 
-```julia:ex17
+```julia:ex19
 p = scatter(howell.weight, howell.height, xlab="weight", ylab="height", lab="");
 savefig(p, joinpath(@OUTPUT, "figure_4_6.svg")); #src
 ```
@@ -250,7 +285,7 @@ TODO
 We can use our posterior samples for credible height nad reproduce the **left
 panel of **figure 4.9 (page 106)**.
 
-```julia:ex18
+```julia:ex20
 for row in 1:length(m4_3_chains)
     yi = m4_3_chains[:α][row] .+ m4_3_chains[:β][row] .* (xi .- mean(howell.weight))
     plot!(p, xi, yi, alpha=0.01, color="#000000", lab="");
@@ -267,7 +302,7 @@ To produce a Compatibility interval, I copied code from this
 [stackoverflow question](https://stackoverflow.com/questions/62028147/plotting-
 credible-intervals-in--from-turing-model).
 
-```julia:ex19
+```julia:ex21
 res = DataFrame(m4_3_chains)
 
 function m4_3_model_eq(weight, α, β, mean_weight)
@@ -298,7 +333,7 @@ The prediction interval is a little trickier as it requires to set an empty
 vector in lieu of the weight data. We this we can reproduce **figure 4.10
 (page 109)**.
 
-```julia:ex20
+```julia:ex22
 x_pred = xi
 m_test = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred)), hcat(x_pred), mean(howell.weight));
 predictions = predict(m_test, m4_3_chains)
