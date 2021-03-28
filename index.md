@@ -10,4 +10,4 @@ This repository contains the code required to reproduce (some of) the figures in
 
 ### By chapter:
 
-  * [Chapter 4](chap_4/)
+  * [Chapter 4](chapters/chap_4/)
