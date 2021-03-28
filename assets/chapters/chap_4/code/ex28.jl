@@ -11,11 +11,11 @@ compat_interval_4_3_s = compat_interval(0.1, 0.9, arr_4_3_s)
 
 m4_3_test_s = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred_s)),
               vcat(x_pred_s), mean(howell_all.weight_s));
-predict_interval_4_3_s = predict_interval(m4_3_test_s, m4_3_chains_s, "height")
+predict_interval_4_3_s = predict_interval(0.1, 0.9, m4_3_test_s, m4_3_chains_s, "height")
 
 p1 = scatter(howell_all.weight_s, howell_all.height,
-            xlab="weight_s", ylab="height", lab="")
+             xlab="weight_s", ylab="height", lab="", title = "Linear")
 plot!(p1, xi_s, compat_interval_4_3_s[2],
       ribbon = [compat_interval_4_3_s[1], compat_interval_4_3_s[3]], lab="")
 plot!(p1, x_pred_s, predict_interval_4_3_s[2],
-      ribbon = [predict_interval_4_3_s[1], predict_interval_4_3_s[3]], lab="")
+      ribbon = [predict_interval_4_3_s[1], predict_interval_4_3_s[3]], lab="");

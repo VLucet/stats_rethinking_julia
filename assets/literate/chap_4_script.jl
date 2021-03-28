@@ -232,15 +232,15 @@ x_pred = xi
 m4_3_test = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred)),
                  vcat(x_pred), mean(howell.weight));
 
-function predict_interval(test, chains, var)
+function predict_interval(lower_bound, upper_bound, test, chains, var)
 
-    predictions = predict(test, chains)
-    pred_array = Array(group(predictions, var))
-    quantiles_pred = [quantile(col, [0.1, 0.9]) for col in eachcol(pred_array)]
+    preds = predict(test, chains)
+    pred_arr = Array(group(preds, var))
+    quants_pred = [quantile(col, [lower_bound, upper_bound]) for col in eachcol(pred_arr)]
 
-    m_pred = [mean(v) for v in eachcol(pred_array)]
-    lower_pred = [q[1] - m for (q, m) in zip(quantiles_pred, m_pred)]
-    upper_pred = [q[2] - m for (q, m) in zip(quantiles_pred, m_pred)]
+    m_pred = [mean(v) for v in eachcol(pred_arr)]
+    lower_pred = [q[1] - m for (q, m) in zip(quants_pred, m_pred)]
+    upper_pred = [q[2] - m for (q, m) in zip(quants_pred, m_pred)]
 
     return(lower_pred, m_pred, upper_pred)
 end
@@ -285,12 +285,59 @@ compat_interval_4_3_s = compat_interval(0.1, 0.9, arr_4_3_s)
 
 m4_3_test_s = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred_s)),
               vcat(x_pred_s), mean(howell_all.weight_s));
-predict_interval_4_3_s = predict_interval(m4_3_test_s, m4_3_chains_s, "height")
+predict_interval_4_3_s = predict_interval(0.1, 0.9, m4_3_test_s, m4_3_chains_s, "height")
 
 p1 = scatter(howell_all.weight_s, howell_all.height,
-            xlab="weight_s", ylab="height", lab="")
+             xlab="weight_s", ylab="height", lab="", title = "Linear")
 plot!(p1, xi_s, compat_interval_4_3_s[2],
       ribbon = [compat_interval_4_3_s[1], compat_interval_4_3_s[3]], lab="")
 plot!(p1, x_pred_s, predict_interval_4_3_s[2],
-      ribbon = [predict_interval_4_3_s[1], predict_interval_4_3_s[3]], lab="")
+      ribbon = [predict_interval_4_3_s[1], predict_interval_4_3_s[3]], lab="");
+
+res_4_5 = DataFrame(m4_5_chains)
+
+function m4_5_model_eq(weight, weight_squared, α, β1, β2)
+    height = α + β1 * weight + β2 * weight_squared
+end
+
+arr_4_5 = [m4_5_model_eq.(w, w_2, res_4_5.α, res_4_5.β1, res_4_5.β2)
+           for (w, w_2) in zip(xi_s, xi_s.^2)]
+compat_interval_4_5 = compat_interval(0.1, 0.9, arr_4_5)
+
+m4_5_test = m4_5(Vector{Union{Missing, Float64}}(undef, length(x_pred_s)),
+                 vcat(x_pred_s), vcat(x_pred_s.^2));
+predict_interval_4_5 = predict_interval(0.1, 0.9, m4_5_test, m4_5_chains, "height")
+
+p2 = scatter(howell_all.weight_s, howell_all.height,
+             xlab="weight_s", ylab="height", lab="", title = "Quadratic")
+plot!(p2, xi_s, compat_interval_4_5[2],
+      ribbon = [compat_interval_4_5[1], compat_interval_4_5[3]], lab="")
+plot!(p2, x_pred_s, predict_interval_4_5[2],
+      ribbon = [predict_interval_4_5[1], predict_interval_4_5[3]], lab="");
+
+res_4_5_2 = DataFrame(m4_5_2_chains)
+
+function m4_5_2_model_eq(weight, weight_squared, weight_cubed, α, β1, β2, β3)
+    height = α + β1 * weight + β2 * weight_squared + β3 * weight_cubed
+end
+
+arr_4_5_2 = [m4_5_2_model_eq.(w, w_2, w_3, res_4_5_2.α,
+                              res_4_5_2.β1, res_4_5_2.β2, res_4_5_2.β3)
+             for (w, w_2, w_3) in zip(xi_s, xi_s.^2, xi_s.^3)]
+compat_interval_4_5_2 = compat_interval(0.1, 0.9, arr_4_5_2)
+
+m4_5_2_test = m4_5_2(Vector{Union{Missing, Float64}}(undef, length(x_pred_s)),
+                     vcat(x_pred_s), vcat(x_pred_s.^2), vcat(x_pred_s.^3));
+predict_interval_4_5_2 = predict_interval(0.1, 0.9, m4_5_2_test, m4_5_2_chains, "height")
+
+p3 = scatter(howell_all.weight_s, howell_all.height,
+             xlab="weight_s", ylab="height", lab="", title = "Cubic")
+plot!(p3, xi_s, compat_interval_4_5_2[2],
+      ribbon = [compat_interval_4_5_2[1], compat_interval_4_5_2[3]], lab="")
+plot!(p3, x_pred_s, predict_interval_4_5_2[2],
+      ribbon = [predict_interval_4_5_2[1], predict_interval_4_5_2[3]], lab="");
+
+figure_4_11 = plot(p1, p2, p3, layout = (1, 3));
+
+savefig(figure_4_11, joinpath(@OUTPUT, "figure_4_11.svg")); #src
 

@@ -240,15 +240,15 @@ plot&#33;&#40;p2, xi, compat_interval_4_3&#91;2&#93;,
 m4_3_test &#61; m4_3&#40;Vector&#123;Union&#123;Missing, Float64&#125;&#125;&#40;undef, length&#40;x_pred&#41;&#41;,
                  vcat&#40;x_pred&#41;, mean&#40;howell.weight&#41;&#41;;
 
-function predict_interval&#40;test, chains, var&#41;
+function predict_interval&#40;lower_bound, upper_bound, test, chains, var&#41;
 
-    predictions &#61; predict&#40;test, chains&#41;
-    pred_array &#61; Array&#40;group&#40;predictions, var&#41;&#41;
-    quantiles_pred &#61; &#91;quantile&#40;col, &#91;0.1, 0.9&#93;&#41; for col in eachcol&#40;pred_array&#41;&#93;
+    preds &#61; predict&#40;test, chains&#41;
+    pred_arr &#61; Array&#40;group&#40;preds, var&#41;&#41;
+    quants_pred &#61; &#91;quantile&#40;col, &#91;lower_bound, upper_bound&#93;&#41; for col in eachcol&#40;pred_arr&#41;&#93;
 
-    m_pred &#61; &#91;mean&#40;v&#41; for v in eachcol&#40;pred_array&#41;&#93;
-    lower_pred &#61; &#91;q&#91;1&#93; - m for &#40;q, m&#41; in zip&#40;quantiles_pred, m_pred&#41;&#93;
-    upper_pred &#61; &#91;q&#91;2&#93; - m for &#40;q, m&#41; in zip&#40;quantiles_pred, m_pred&#41;&#93;
+    m_pred &#61; &#91;mean&#40;v&#41; for v in eachcol&#40;pred_arr&#41;&#93;
+    lower_pred &#61; &#91;q&#91;1&#93; - m for &#40;q, m&#41; in zip&#40;quants_pred, m_pred&#41;&#93;
+    upper_pred &#61; &#91;q&#91;2&#93; - m for &#40;q, m&#41; in zip&#40;quants_pred, m_pred&#41;&#93;
 
     return&#40;lower_pred, m_pred, upper_pred&#41;
 end
@@ -260,8 +260,11 @@ plot&#33;&#40;p3, xi, compat_interval_4_3&#91;2&#93;,
       ribbon &#61; &#91;compat_interval_4_3&#91;1&#93;, compat_interval_4_3&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;
 plot&#33;&#40;p3, x_pred, predict_interval_4_3&#91;2&#93;,
       ribbon &#61; &#91;predict_interval_4_3&#91;1&#93;, predict_interval_4_3&#91;3&#93;&#93;,
-      xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;</code></pre>
-<img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_10.svg" alt="">
+      xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;</code></pre><pre><code class=plaintext >MethodError: no method matching predict_interval(::DynamicPPL.Model{Main.FD_SANDBOX_16533409700135599139.var"#5#6", (:height, :weight, :weight_mean), (), (), Tuple{Vector{Union{Missing, Float64}}, Vector{Float64}, Float64}, Tuple{}}, ::MCMCChains.Chains{Float64, AxisArrays.AxisArray{Float64, 3, Array{Float64, 3}, Tuple{AxisArrays.Axis{:iter, StepRange{Int64, Int64}}, AxisArrays.Axis{:var, Vector{Symbol}}, AxisArrays.Axis{:chain, UnitRange{Int64}}}}, Missing, NamedTuple{(:parameters, :internals), Tuple{Vector{Symbol}, Vector{Symbol}}}, NamedTuple{(), Tuple{}}}, ::String)
+Closest candidates are:
+  predict_interval(::Any, ::Any, ::Any, !Matched::Any, !Matched::Any) at none:2
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/chapters/chap_4/code/figure_4_10.svg' not found. //</span></p>
 <h2 id=figure_411 ><a href="#figure_411" class=header-anchor >Figure 4.11</a></h2>
 <p>For what follows, let&#39;s reload the data with all rows. We also standardize weights and create polynomial variables for weights.</p>
 <pre><code class=language-julia >howell_all &#61; CSV.read&#40;data_path, DataFrame; delim&#61;&#39;;&#39;&#41;;
@@ -293,14 +296,60 @@ compat_interval_4_3_s &#61; compat_interval&#40;0.1, 0.9, arr_4_3_s&#41;
 
 m4_3_test_s &#61; m4_3&#40;Vector&#123;Union&#123;Missing, Float64&#125;&#125;&#40;undef, length&#40;x_pred_s&#41;&#41;,
               vcat&#40;x_pred_s&#41;, mean&#40;howell_all.weight_s&#41;&#41;;
-predict_interval_4_3_s &#61; predict_interval&#40;m4_3_test_s, m4_3_chains_s, &quot;height&quot;&#41;
+predict_interval_4_3_s &#61; predict_interval&#40;0.1, 0.9, m4_3_test_s, m4_3_chains_s, &quot;height&quot;&#41;
 
 p1 &#61; scatter&#40;howell_all.weight_s, howell_all.height,
-            xlab&#61;&quot;weight_s&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;
+             xlab&#61;&quot;weight_s&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;, title &#61; &quot;Linear&quot;&#41;
 plot&#33;&#40;p1, xi_s, compat_interval_4_3_s&#91;2&#93;,
       ribbon &#61; &#91;compat_interval_4_3_s&#91;1&#93;, compat_interval_4_3_s&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;
 plot&#33;&#40;p1, x_pred_s, predict_interval_4_3_s&#91;2&#93;,
-      ribbon &#61; &#91;predict_interval_4_3_s&#91;1&#93;, predict_interval_4_3_s&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;</code></pre><pre><code class=plaintext >Plot{Plots.GRBackend() n=3}</code></pre>
+      ribbon &#61; &#91;predict_interval_4_3_s&#91;1&#93;, predict_interval_4_3_s&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;;</code></pre>
+<p>Now the square model.</p>
+<pre><code class=language-julia >res_4_5 &#61; DataFrame&#40;m4_5_chains&#41;
+
+function m4_5_model_eq&#40;weight, weight_squared, α, β1, β2&#41;
+    height &#61; α &#43; β1 * weight &#43; β2 * weight_squared
+end
+
+arr_4_5 &#61; &#91;m4_5_model_eq.&#40;w, w_2, res_4_5.α, res_4_5.β1, res_4_5.β2&#41;
+           for &#40;w, w_2&#41; in zip&#40;xi_s, xi_s.^2&#41;&#93;
+compat_interval_4_5 &#61; compat_interval&#40;0.1, 0.9, arr_4_5&#41;
+
+m4_5_test &#61; m4_5&#40;Vector&#123;Union&#123;Missing, Float64&#125;&#125;&#40;undef, length&#40;x_pred_s&#41;&#41;,
+                 vcat&#40;x_pred_s&#41;, vcat&#40;x_pred_s.^2&#41;&#41;;
+predict_interval_4_5 &#61; predict_interval&#40;0.1, 0.9, m4_5_test, m4_5_chains, &quot;height&quot;&#41;
+
+p2 &#61; scatter&#40;howell_all.weight_s, howell_all.height,
+             xlab&#61;&quot;weight_s&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;, title &#61; &quot;Quadratic&quot;&#41;
+plot&#33;&#40;p2, xi_s, compat_interval_4_5&#91;2&#93;,
+      ribbon &#61; &#91;compat_interval_4_5&#91;1&#93;, compat_interval_4_5&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;
+plot&#33;&#40;p2, x_pred_s, predict_interval_4_5&#91;2&#93;,
+      ribbon &#61; &#91;predict_interval_4_5&#91;1&#93;, predict_interval_4_5&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;;</code></pre>
+<p>Finally the cubic model.</p>
+<pre><code class=language-julia >res_4_5_2 &#61; DataFrame&#40;m4_5_2_chains&#41;
+
+function m4_5_2_model_eq&#40;weight, weight_squared, weight_cubed, α, β1, β2, β3&#41;
+    height &#61; α &#43; β1 * weight &#43; β2 * weight_squared &#43; β3 * weight_cubed
+end
+
+arr_4_5_2 &#61; &#91;m4_5_2_model_eq.&#40;w, w_2, w_3, res_4_5_2.α,
+                              res_4_5_2.β1, res_4_5_2.β2, res_4_5_2.β3&#41;
+             for &#40;w, w_2, w_3&#41; in zip&#40;xi_s, xi_s.^2, xi_s.^3&#41;&#93;
+compat_interval_4_5_2 &#61; compat_interval&#40;0.1, 0.9, arr_4_5_2&#41;
+
+m4_5_2_test &#61; m4_5_2&#40;Vector&#123;Union&#123;Missing, Float64&#125;&#125;&#40;undef, length&#40;x_pred_s&#41;&#41;,
+                     vcat&#40;x_pred_s&#41;, vcat&#40;x_pred_s.^2&#41;, vcat&#40;x_pred_s.^3&#41;&#41;;
+predict_interval_4_5_2 &#61; predict_interval&#40;0.1, 0.9, m4_5_2_test, m4_5_2_chains, &quot;height&quot;&#41;
+
+p3 &#61; scatter&#40;howell_all.weight_s, howell_all.height,
+             xlab&#61;&quot;weight_s&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;, title &#61; &quot;Cubic&quot;&#41;
+plot&#33;&#40;p3, xi_s, compat_interval_4_5_2&#91;2&#93;,
+      ribbon &#61; &#91;compat_interval_4_5_2&#91;1&#93;, compat_interval_4_5_2&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;
+plot&#33;&#40;p3, x_pred_s, predict_interval_4_5_2&#91;2&#93;,
+      ribbon &#61; &#91;predict_interval_4_5_2&#91;1&#93;, predict_interval_4_5_2&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;;</code></pre>
+<p>And we can now assemble the figure.</p>
+<pre><code class=language-julia >figure_4_11 &#61; plot&#40;p1, p2, p3, layout &#61; &#40;1, 3&#41;&#41;;</code></pre>
+<img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_11.svg" alt="">
 <h2 id=figure_412 ><a href="#figure_412" class=header-anchor >Figure 4.12</a></h2>
 <p>TODO</p>
 <h2 id=figure_413 ><a href="#figure_413" class=header-anchor >Figure 4.13</a></h2>
