@@ -275,12 +275,16 @@ p_all = make_plot(howell, samples_N_all, 352)
 
 figure_4_7 = plot(p_10, p_50, p_150, p_all, layout = (2,2));
 
-avefig(p, joinpath(@OUTPUT, "figure_4_7.svg")); #src 
+savefig(figure_4_7, joinpath(@OUTPUT, "figure_4_7.svg")); #src 
 
 # \figalt{}{figure_4_7.svg}
 
 # ## Figure 4.8
-# TODO
+
+# We plot the posterior of height for weight = 50.
+μ_at_50 = samples_N_all.α .+ samples_N_all.β .* (50 - mean(howell.weight))
+
+density(μ_at_50)
 
 # ## Figure 4.9
 
