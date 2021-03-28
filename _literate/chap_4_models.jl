@@ -1,30 +1,31 @@
 ## CHAPTER 4 MODELS
 
-# m4_1
+using Turing
+
+#  ## 4.1
 @model function m4_1(height)
+
     σ ~ Uniform(0, 50)
     μ ~ Normal(178, 20)
+    
     height .~ Normal.(μ, σ)
-end
 
-# m4_2, different prior on μ
+end;
+
+#  ## 4.2
+# Same as 4.1, but with a different prior on μ.
+
 @model function m4_2(height)  
+
     σ ~ Uniform(0, 50)
     μ ~ Normal(178, 0.1)
+    
     height .~ Normal.(μ, σ)
-end
 
-# m4_3, regression
-# @model function m4_3(height, weight)
-#     α ~ Normal(178, 20)
-#     β ~ LogNormal(0, 1)
-#     μ = α .+ β .* (weight.-mean(weight))
-#     σ ~ LogNormal(0, 50)
-#     height .~ Normal.(μ, σ)
-# end
+end;
 
-# Equivalent to what folows, but loop format 
-# is better for predictions
+# ## 4.3
+
 @model function m4_3(height, weight, weight_mean)
     
     if ismissing(weight_mean)
@@ -40,9 +41,23 @@ end
         height[i] ~ Normal(μ[i], σ)
     end
 
-end
+end; 
 
-# Different prior on β
+# Another syntax for this model follows, but does not work as well for prediction.
+
+@model function other_m4_3(height, weight)
+    
+    α ~ Normal(178, 20)
+    β ~ LogNormal(0, 1)
+    μ = α .+ β .* (weight.-mean(weight))
+    σ ~ LogNormal(0, 50)
+    
+    height .~ Normal.(μ, σ)
+
+end;
+
+# Same as 4.3, but with a different prior on β
+
 @model function m4_3_2(height, weight, weight_mean)
     
     if ismissing(weight_mean)
