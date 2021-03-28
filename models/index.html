@@ -1,0 +1,78 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/stats_rethinking_julia/libs/highlight/github.min.css"> <link rel=stylesheet  href="/stats_rethinking_julia/css/franklin.css"> <link rel=stylesheet  href="/stats_rethinking_julia/css/poole_hyde.css"> <link rel=stylesheet  href="/stats_rethinking_julia/css/custom.css"> <style> html {font-size: 17px;} .franklin-content {position: relative; padding-left: 8%; padding-right: 5%;} @media (min-width: 940px) { .franklin-content {width: 100%; margin-left: auto; margin-right: auto;} } @media (max-width: 768px) { .franklin-content {padding-left: 6%; padding-right: 6%;} } </style> <link rel=icon  href="/stats_rethinking_julia/assets/favicon.png"> <title>All models</title> <div class=sidebar > <div class="container sidebar-sticky"> <div class=sidebar-about > </div> <style> @media (min-width: 768px) { /* .sidebar-nav { } */ } .sidebar .container.sidebar-sticky { top: 4rem; } .sidebar-nav .sidebar-nav-item.active { box-sizing: border-box; border-bottom: 1px #f1f1f1 solid; margin-right: -1em; margin-left: -0.5em; padding-left: 0.5em; color: white; font-weight: normal !important; } .sidebar-nav .sidebar-nav-item { color: #cccccc; margin: 0.25em 0; } </style> <nav class=sidebar-nav  style="opacity: 0.9"> <a class="sidebar-nav-item " href="/stats_rethinking_julia/">Home</a> <a class="sidebar-nav-item " href="/stats_rethinking_julia/models/">All models</a> <a class="sidebar-nav-item " href="/stats_rethinking_julia/chapters/chap_4/">Chapter 4</a> </nav> <div class=bottom-sidebar > <a href="https://github.com/VLucet/stats_rethinking_julia">Go to GitHub repository &rarr;</a> <br> <br> <a href="https://julialang.org/"><img src="https://raw.githubusercontent.com/JuliaLang/julia-logo-graphics/master/images/julia-logo-dark.svg" height=32  style="display: inline-block; margin-bottom: -8px; opacity: 0.7"> powered.</a> </div> </div> </div> <div class="content container"> <div class=franklin-content > <h1 class=sidebar-title ><a href="/stats_rethinking_julia/">Turing<span style="opacity:0.4"> models</span></a></h1> <h2 id=chapter_4 ><a href="#chapter_4" class=header-anchor >Chapter 4</a></h2> <pre><code class=language-julia ># CHAPTER 4 MODELS
+
+using Turing</code></pre> <h2>4.1</h2> <pre><code class=language-julia >@model function m4_1&#40;height&#41;
+
+    σ ~ Uniform&#40;0, 50&#41;
+    μ ~ Normal&#40;178, 20&#41;
+
+    height .~ Normal.&#40;μ, σ&#41;
+
+end;</code></pre> <h2>4.2</h2> <p>Same as 4.1, but with a different prior on μ.</p> <pre><code class=language-julia >@model function m4_2&#40;height&#41;
+
+    σ ~ Uniform&#40;0, 50&#41;
+    μ ~ Normal&#40;178, 0.1&#41;
+
+    height .~ Normal.&#40;μ, σ&#41;
+
+end;</code></pre> <h2 id=43 ><a href="#43" class=header-anchor >4.3</a></h2> <pre><code class=language-julia >@model function m4_3&#40;height, weight, weight_mean&#41;
+
+    if ismissing&#40;weight_mean&#41;
+        weight_mean &#61; mean&#40;weight&#41;
+    end
+
+    α ~ Normal&#40;178, 20&#41;
+    β ~ LogNormal&#40;0, 1&#41;
+    μ &#61; α .&#43; β .* &#40;weight.-weight_mean&#41;
+    σ ~ LogNormal&#40;0, 5&#41;
+
+    for i in 1:length&#40;height&#41;
+        height&#91;i&#93; ~ Normal&#40;μ&#91;i&#93;, σ&#41;
+    end
+
+end;</code></pre> <p>Another syntax for this model follows, but does not work as well for prediction.</p> <pre><code class=language-julia >@model function other_m4_3&#40;height, weight&#41;
+
+    α ~ Normal&#40;178, 20&#41;
+    β ~ LogNormal&#40;0, 1&#41;
+    μ &#61; α .&#43; β .* &#40;weight.-mean&#40;weight&#41;&#41;
+    σ ~ LogNormal&#40;0, 50&#41;
+
+    height .~ Normal.&#40;μ, σ&#41;
+
+end;</code></pre> <p>Same as 4.3, but with a different prior on β</p> <pre><code class=language-julia >@model function m4_3_2&#40;height, weight, weight_mean&#41;
+
+    if ismissing&#40;weight_mean&#41;
+        weight_mean &#61; mean&#40;weight&#41;
+    end
+
+    α ~ Normal&#40;178, 20&#41;
+    β ~ LogNormal&#40;0, 10&#41;
+    μ &#61; α .&#43; β .* &#40;weight.-weight_mean&#41;
+    σ ~ LogNormal&#40;0, 5&#41;
+
+    for i in 1:length&#40;height&#41;
+        height&#91;i&#93; ~ Normal&#40;μ&#91;i&#93;, σ&#41;
+    end
+
+end</code></pre><pre><code class=plaintext >m4_3_2 (generic function with 1 method)</code></pre>
+
+<div class=page-foot >
+  <div class=copyright >
+    &copy; Valentin Lucet (theme modified from SymbolicsUtils.jl). Last modified: March 28, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://github.com/tlienart/PkgPage.jl">PkgPage.jl</a>.
+  </div>
+</div>
+</div>
+    </div>  
+    
+    <script>
+        var els =  document.querySelectorAll(".language-julia")
+        for (var i=0, l = els.length; i < l; i++) {
+            var el = els[i]
+            var out = el.parentNode.nextSibling
+            if (out.tagName === "PRE") {
+                out.className = out.className + " code-output"
+            }
+        }
+    </script>
+    
+        <script src="/stats_rethinking_julia/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>

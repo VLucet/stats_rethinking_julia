@@ -1,7 +1,7 @@
 # This file was generated, do not modify it.
 
 include("src/load_packages.jl");
-include("src/models/chap_4_models.jl");
+include("_literate/chap_4_models.jl");
 Random.seed!(77);
 
 U = Uniform(-1,1)
