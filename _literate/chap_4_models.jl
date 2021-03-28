@@ -33,9 +33,10 @@ end;
     end
     
     α ~ Normal(178, 20)
-    β ~ LogNormal(0, 1)
+    β ~ LogNormal(0, 10)
+    σ ~ Uniform(0, 5)
+    
     μ = α .+ β .* (weight.-weight_mean)
-    σ ~ LogNormal(0, 5) 
 
     for i in 1:length(height)
         height[i] ~ Normal(μ[i], σ)
@@ -48,9 +49,10 @@ end;
 @model function other_m4_3(height, weight)
     
     α ~ Normal(178, 20)
-    β ~ LogNormal(0, 1)
+    β ~ LogNormal(0, 10)
+    σ ~ Uniform(0, 50)
+
     μ = α .+ β .* (weight.-mean(weight))
-    σ ~ LogNormal(0, 50)
     
     height .~ Normal.(μ, σ)
 
@@ -65,9 +67,27 @@ end;
     end
     
     α ~ Normal(178, 20)
-    β ~ LogNormal(0, 10)
+    β ~ LogNormal(0, 1) 
+    σ ~ Uniform(0, 50) 
+
     μ = α .+ β .* (weight.-weight_mean)
-    σ ~ LogNormal(0, 5) 
+
+    for i in 1:length(height)
+        height[i] ~ Normal(μ[i], σ)
+    end
+
+end
+
+# ## 4.5
+
+@model function m4_5(height, weight, weight_squared)
+
+    α ~ Normal(178, 20)
+    β1 ~ LogNormal(0, 1)
+    β2 ~ Normal(0,1)
+    σ ~ Uniform(0, 50) 
+
+    μ = α .+ β1 .* weight .+ β2 .* weight_squared
 
     for i in 1:length(height)
         height[i] ~ Normal(μ[i], σ)
