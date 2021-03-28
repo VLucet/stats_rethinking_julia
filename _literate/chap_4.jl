@@ -284,7 +284,11 @@ savefig(figure_4_7, joinpath(@OUTPUT, "figure_4_7.svg")); #src
 # We plot the posterior of height for weight = 50.
 μ_at_50 = samples_N_all.α .+ samples_N_all.β .* (50 - mean(howell.weight))
 
-density(μ_at_50)
+figure_4_8 = density(μ_at_50, xlab="μ | weight = 50", ylab="Density", lab="");
+
+savefig(figure_4_8, joinpath(@OUTPUT, "figure_4_8.svg")); #src 
+
+# \figalt{}{figure_4_8.svg}
 
 # ## Figure 4.9
 
