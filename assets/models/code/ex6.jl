@@ -15,4 +15,4 @@
         height[i] ~ Normal(μ[i], σ)
     end
 
-end
+end;

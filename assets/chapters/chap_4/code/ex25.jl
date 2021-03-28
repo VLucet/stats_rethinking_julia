@@ -1,4 +1,5 @@
 # This file was generated, do not modify it. # hide
-howell = CSV.read(data_path, DataFrame; delim=';');
-howell.weight_s = (howell.weight .- mean(howell.weight))./std(howell.weight)
-howell.weight_s2 = howell.weight_s.^2;
+howell_all = CSV.read(data_path, DataFrame; delim=';');
+howell_all.weight_s = (howell_all.weight .- mean(howell_all.weight))./std(howell_all.weight)
+howell_all.weight_s2 = howell_all.weight_s.^2
+howell_all.weight_s3 = howell_all.weight_s.^3;

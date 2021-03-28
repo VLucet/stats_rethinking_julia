@@ -113,6 +113,7 @@ m4_3_2_model &#61; m4_3_2&#40;howell.height, howell.weight, missing&#41;;</code>
 m4_3_2_chains_prior &#61; sample&#40;m4_3_2_model, Prior&#40;&#41;, 100&#41;;</code></pre>
 <p>We can now reproduce the figure, first with the left plot for the first prior.</p>
 <pre><code class=language-julia >xi &#61; minimum&#40;howell.weight&#41;:0.1:maximum&#40;howell.weight&#41;
+
 p &#61; plot&#40;&#41;;
 
 for row in 1:length&#40;m4_3_chains_prior&#41;
@@ -199,60 +200,107 @@ figure_4_8 &#61; density&#40;μ_at_50, xlab&#61;&quot;μ | weight &#61; 50&quot;
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_8.svg" alt="">
 <h2 id=figure_49 ><a href="#figure_49" class=header-anchor >Figure 4.9</a></h2>
 <p>We can use our posterior samples for credible height nad reproduce the <strong>left panel of **figure 4.9 &#40;page 106&#41;</strong>.</p>
-<pre><code class=language-julia >for row in 1:length&#40;m4_3_chains&#41;
+<pre><code class=language-julia >p &#61; scatter&#40;howell.weight, howell.height, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;
+
+for row in 1:length&#40;m4_3_chains&#41;
     yi &#61; m4_3_chains&#91;:α&#93;&#91;row&#93; .&#43; m4_3_chains&#91;:β&#93;&#91;row&#93; .* &#40;xi .- mean&#40;howell.weight&#41;&#41;
     plot&#33;&#40;p, xi, yi, alpha&#61;0.01, color&#61;&quot;#000000&quot;, lab&#61;&quot;&quot;&#41;;
 end</code></pre>
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_9_a.svg" alt="">
 <h4 id=compatibility_interval ><a href="#compatibility_interval" class=header-anchor >Compatibility interval</a></h4>
 <p>To produce a Compatibility interval, I copied code from this <a href="https://stackoverflow.com/questions/62028147/plotting- credible-intervals-in--from-turing-model">stackoverflow question</a>.</p>
-<pre><code class=language-julia >res &#61; DataFrame&#40;m4_3_chains&#41;
+<pre><code class=language-julia >res_4_3 &#61; DataFrame&#40;m4_3_chains&#41;
 
 function m4_3_model_eq&#40;weight, α, β, mean_weight&#41;
     height &#61; α &#43; β * &#40;weight .- mean_weight&#41;
 end
 
-arr &#61; &#91;m4_3_model_eq.&#40;w, res.α, res.β, mean&#40;howell.weight&#41;&#41; for w in xi&#93;
-m &#61; &#91;mean&#40;v&#41; for v in arr&#93;
+arr_4_3 &#61; &#91;m4_3_model_eq.&#40;w, res_4_3.α, res_4_3.β, mean&#40;howell.weight&#41;&#41; for w in xi&#93;
 
-quantiles &#61; &#91;quantile&#40;v, &#91;0.1, 0.9&#93;&#41; for v in arr&#93;
+function compat_interval&#40;lower_bound, upper_bound, array&#41;
+    mean_vector &#61; &#91;mean&#40;v&#41; for v in array&#93;
+    quantiles &#61; &#91;quantile&#40;v, &#91;lower_bound, upper_bound&#93;&#41; for v in array&#93;
+    lower &#61; &#91;q&#91;1&#93; - m for &#40;q, m&#41; in zip&#40;quantiles, mean_vector&#41;&#93;
+    upper &#61; &#91;q&#91;2&#93; - m for &#40;q, m&#41; in zip&#40;quantiles, mean_vector&#41;&#93;
+    return lower, mean_vector, upper
+end
 
-lower &#61; &#91;q&#91;1&#93; - m for &#40;q, m&#41; in zip&#40;quantiles, m&#41;&#93;
-upper &#61; &#91;q&#91;2&#93; - m for &#40;q, m&#41; in zip&#40;quantiles, m&#41;&#93;
+compat_interval_4_3 &#61; compat_interval&#40;0.1, 0.9, arr_4_3&#41;
 
 p2 &#61; scatter&#40;howell.weight, howell.height, lab&#61;&quot;&quot;&#41;
-plot&#33;&#40;p2, xi, m, ribbon &#61; &#91;lower, upper&#93;, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;</code></pre>
+plot&#33;&#40;p2, xi, compat_interval_4_3&#91;2&#93;,
+      ribbon &#61; &#91;compat_interval_4_3&#91;1&#93;, compat_interval_4_3&#91;3&#93;&#93;,
+      xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;</code></pre>
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_9_b.svg" alt="">
 <h2 id=figure_410 ><a href="#figure_410" class=header-anchor >Figure 4.10</a></h2>
 <h4 id=prediction_interval ><a href="#prediction_interval" class=header-anchor >Prediction interval</a></h4>
 <p>The prediction interval is a little trickier as it requires to set an empty vector in lieu of the weight data. We this we can reproduce <strong>figure 4.10 &#40;page 109&#41;</strong>.</p>
 <pre><code class=language-julia >x_pred &#61; xi
-m_test &#61; m4_3&#40;Vector&#123;Union&#123;Missing, Float64&#125;&#125;&#40;undef, length&#40;x_pred&#41;&#41;,
-              hcat&#40;x_pred&#41;, mean&#40;howell.weight&#41;&#41;;
-predictions &#61; predict&#40;m_test, m4_3_chains&#41;
 
-pred_array &#61; Array&#40;group&#40;predictions, :height&#41;&#41;
-quantiles_pred &#61; &#91;quantile&#40;col, &#91;0.1, 0.9&#93;&#41; for col in eachcol&#40;pred_array&#41;&#93;
-m_pred &#61; &#91;mean&#40;v&#41; for v in eachcol&#40;pred_array&#41;&#93;
-lower_pred &#61; &#91;q&#91;1&#93; - m for &#40;q, m&#41; in zip&#40;quantiles_pred, m_pred&#41;&#93;
-upper_pred &#61; &#91;q&#91;2&#93; - m for &#40;q, m&#41; in zip&#40;quantiles_pred, m_pred&#41;&#93;
+m4_3_test &#61; m4_3&#40;Vector&#123;Union&#123;Missing, Float64&#125;&#125;&#40;undef, length&#40;x_pred&#41;&#41;,
+                 vcat&#40;x_pred&#41;, mean&#40;howell.weight&#41;&#41;;
+
+function predict_interval&#40;test, chains, var&#41;
+
+    predictions &#61; predict&#40;test, chains&#41;
+    pred_array &#61; Array&#40;group&#40;predictions, var&#41;&#41;
+    quantiles_pred &#61; &#91;quantile&#40;col, &#91;0.1, 0.9&#93;&#41; for col in eachcol&#40;pred_array&#41;&#93;
+
+    m_pred &#61; &#91;mean&#40;v&#41; for v in eachcol&#40;pred_array&#41;&#93;
+    lower_pred &#61; &#91;q&#91;1&#93; - m for &#40;q, m&#41; in zip&#40;quantiles_pred, m_pred&#41;&#93;
+    upper_pred &#61; &#91;q&#91;2&#93; - m for &#40;q, m&#41; in zip&#40;quantiles_pred, m_pred&#41;&#93;
+
+    return&#40;lower_pred, m_pred, upper_pred&#41;
+end
+
+predict_interval_4_3 &#61; predict_interval&#40;m4_3_test, m4_3_chains, &quot;height&quot;&#41;
 
 p3 &#61; scatter&#40;howell.weight, howell.height, lab&#61;&quot;&quot;&#41;
-plot&#33;&#40;p3, xi, m, ribbon &#61; &#91;lower, upper&#93;, lab&#61;&quot;&quot;&#41;
-plot&#33;&#40;p3, x_pred, m_pred, ribbon &#61; &#91;lower_pred, upper_pred&#93;,
+plot&#33;&#40;p3, xi, compat_interval_4_3&#91;2&#93;,
+      ribbon &#61; &#91;compat_interval_4_3&#91;1&#93;, compat_interval_4_3&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;
+plot&#33;&#40;p3, x_pred, predict_interval_4_3&#91;2&#93;,
+      ribbon &#61; &#91;predict_interval_4_3&#91;1&#93;, predict_interval_4_3&#91;3&#93;&#93;,
       xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;</code></pre>
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_10.svg" alt="">
 <h2 id=figure_411 ><a href="#figure_411" class=header-anchor >Figure 4.11</a></h2>
-<p>For what follows, let&#39;s reload the data with all rows. We also standardize weights and create a polynormial variable for weights.</p>
-<pre><code class=language-julia >howell &#61; CSV.read&#40;data_path, DataFrame; delim&#61;&#39;;&#39;&#41;;
-howell.weight_s &#61; &#40;howell.weight .- mean&#40;howell.weight&#41;&#41;./std&#40;howell.weight&#41;
-howell.weight_s2 &#61; howell.weight_s.^2;</code></pre>
+<p>For what follows, let&#39;s reload the data with all rows. We also standardize weights and create polynomial variables for weights.</p>
+<pre><code class=language-julia >howell_all &#61; CSV.read&#40;data_path, DataFrame; delim&#61;&#39;;&#39;&#41;;
+howell_all.weight_s &#61; &#40;howell_all.weight .- mean&#40;howell_all.weight&#41;&#41;./std&#40;howell_all.weight&#41;
+howell_all.weight_s2 &#61; howell_all.weight_s.^2
+howell_all.weight_s3 &#61; howell_all.weight_s.^3;</code></pre>
 <p>We can now condition the model on data and sample.</p>
-<pre><code class=language-julia >m4_5_model &#61; m4_5&#40;howell.height, howell.weight_s, howell.weight_s2&#41;
+<pre><code class=language-julia >m4_5_model &#61; m4_5&#40;howell_all.height, howell_all.weight_s, howell_all.weight_s2&#41;
 m4_5_chains &#61; sample&#40;m4_5_model, NUTS&#40;0.65&#41;, 1000&#41;
 
 m4_5_chains_plot &#61; plot&#40;m4_5_chains&#41;;</code></pre>
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/m4_5_plot.svg" alt="Chains for model 4_5">
+<p>Similarly for the cubic model:</p>
+<pre><code class=language-julia >m4_5_2_model &#61; m4_5_2&#40;howell_all.height, howell_all.weight_s, howell_all.weight_s2, howell_all.weight_s3&#41;
+m4_5_2_chains &#61; sample&#40;m4_5_2_model, NUTS&#40;0.65&#41;, 1000&#41;
+
+m4_5_2_chains_plot &#61; plot&#40;m4_5_2_chains&#41;;</code></pre>
+<img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/m4_5_2_plot.svg" alt="Chains for model 4_5_2">
+<p>To reproduce <strong>figure 4.11 &#40;page112&#41;</strong>, we need to repeat the process for figure 4.10. We start with the linear model for all the data.</p>
+<pre><code class=language-julia >xi_s &#61; minimum&#40;howell_all.weight_s&#41;:0.1:maximum&#40;howell_all.weight_s&#41;
+x_pred_s &#61; xi_s
+
+m4_3_model_s &#61; m4_3&#40;howell_all.height, howell_all.weight_s, 0&#41;
+m4_3_chains_s &#61; sample&#40;m4_3_model_s, NUTS&#40;0.65&#41;, 1000&#41;
+res_4_3_s &#61; DataFrame&#40;m4_3_chains_s&#41;
+arr_4_3_s &#61; &#91;m4_3_model_eq.&#40;w, res_4_3_s.α, res_4_3_s.β, 0&#41; for w in xi_s&#93;
+
+compat_interval_4_3_s &#61; compat_interval&#40;0.1, 0.9, arr_4_3_s&#41;
+
+m4_3_test_s &#61; m4_3&#40;Vector&#123;Union&#123;Missing, Float64&#125;&#125;&#40;undef, length&#40;x_pred_s&#41;&#41;,
+              vcat&#40;x_pred_s&#41;, mean&#40;howell_all.weight_s&#41;&#41;;
+predict_interval_4_3_s &#61; predict_interval&#40;m4_3_test_s, m4_3_chains_s, &quot;height&quot;&#41;
+
+p1 &#61; scatter&#40;howell_all.weight_s, howell_all.height,
+            xlab&#61;&quot;weight_s&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;
+plot&#33;&#40;p1, xi_s, compat_interval_4_3_s&#91;2&#93;,
+      ribbon &#61; &#91;compat_interval_4_3_s&#91;1&#93;, compat_interval_4_3_s&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;
+plot&#33;&#40;p1, x_pred_s, predict_interval_4_3_s&#91;2&#93;,
+      ribbon &#61; &#91;predict_interval_4_3_s&#91;1&#93;, predict_interval_4_3_s&#91;3&#93;&#93;, lab&#61;&quot;&quot;&#41;</code></pre><pre><code class=plaintext >Plot{Plots.GRBackend() n=3}</code></pre>
 <h2 id=figure_412 ><a href="#figure_412" class=header-anchor >Figure 4.12</a></h2>
 <p>TODO</p>
 <h2 id=figure_413 ><a href="#figure_413" class=header-anchor >Figure 4.13</a></h2>

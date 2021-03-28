@@ -1,5 +1,6 @@
 # This file was generated, do not modify it. # hide
 xi = minimum(howell.weight):0.1:maximum(howell.weight)
+
 p = plot();
 
 for row in 1:length(m4_3_chains_prior)
