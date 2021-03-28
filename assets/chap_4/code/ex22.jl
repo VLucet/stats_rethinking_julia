@@ -1,16 +1,19 @@
 # This file was generated, do not modify it. # hide
-x_pred = xi
-m_test = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred)), hcat(x_pred), mean(howell.weight));
-predictions = predict(m_test, m4_3_chains)
+res = DataFrame(m4_3_chains)
 
-pred_array = Array(group(predictions, :height))
-quantiles_pred = [quantile(col, [0.1, 0.9]) for col in eachcol(pred_array)]
-m_pred = [mean(v) for v in eachcol(pred_array)]
-lower_pred = [q[1] - m for (q, m) in zip(quantiles_pred, m_pred)]
-upper_pred = [q[2] - m for (q, m) in zip(quantiles_pred, m_pred)]
+function m4_3_model_eq(weight, α, β, mean_weight)
+    height = α + β * (weight .- mean_weight)
+end
 
-p3 = scatter(howell.weight, howell.height, lab="")
-plot!(p3, xi, m, ribbon = [lower, upper], lab="")
-plot!(p3, x_pred, m_pred, ribbon = [lower_pred, upper_pred], xlab="weight", ylab="height", lab="")
+arr = [m4_3_model_eq.(w, res.α, res.β, mean(howell.weight)) for w in xi]
+m = [mean(v) for v in arr]
 
-savefig(p3, joinpath(@OUTPUT, "figure_4_10.svg")); #src
+quantiles = [quantile(v, [0.1, 0.9]) for v in arr]
+
+lower = [q[1] - m for (q, m) in zip(quantiles, m)]
+upper = [q[2] - m for (q, m) in zip(quantiles, m)]
+
+p2 = scatter(howell.weight, howell.height, lab="")
+plot!(p2, xi, m, ribbon = [lower, upper], xlab="weight", ylab="height", lab="")
+
+savefig(p2, joinpath(@OUTPUT, "figure_4_9_b.svg")); #src

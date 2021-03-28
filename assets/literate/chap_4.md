@@ -275,7 +275,51 @@ savefig(p, joinpath(@OUTPUT, "figure_4_6.svg")); #src
 \figalt{}{figure_4_6.svg}
 
 ## Figure 4.7
-TODO
+
+For this figure we plot an increasing number of points to show the uncertainty
+decreasing as N increases.
+
+```julia:ex20
+howell_10 = howell[1:10,:]
+howell_50 = howell[1:50,:]
+howell_150 = howell[1:150,:]
+
+m4_3_model_N10 = m4_3(howell_10.height, howell_10.weight, missing)
+m4_3_model_N50 = m4_3(howell_50.height, howell_50.weight, missing)
+m4_3_model_N150 = m4_3(howell_150.height, howell_150.weight, missing)
+
+m4_3_N10_chains = sample(m4_3_model_N10, NUTS(0.65), 1000)
+m4_3_N50_chains = sample(m4_3_model_N50, NUTS(0.65), 1000)
+m4_3_N150_chains = sample(m4_3_model_N150, NUTS(0.65), 1000)
+
+the_20_rows = sample(1:1000, 20)
+
+samples_N_all = DataFrame(m4_3_chains)[the_20_rows,[:α,:β]]
+samples_N10 = DataFrame(m4_3_N10_chains)[the_20_rows,[:α,:β]]
+samples_N50 = DataFrame(m4_3_N50_chains)[the_20_rows,[:α,:β]]
+samples_N150 = DataFrame(m4_3_N150_chains)[the_20_rows,[:α,:β]]
+
+function make_plot(dat, samples, N)
+    p_new = scatter(dat.weight, dat.height, xlab="weight", ylab="height", lab="");
+    for row in eachrow(samples)
+        y = row.α .+ row.β .* (dat.weight .- mean(dat.weight))
+        plot!(p_new, dat.weight, y, alpha=0.1, color="#000000", lab="",
+              title = "N = $N")
+    end
+    return(p_new)
+end
+
+p_10 = make_plot(howell_10, samples_N10, 10)
+p_50 = make_plot(howell_50, samples_N50, 50)
+p_150 = make_plot(howell_150, samples_N150, 150)
+p_all = make_plot(howell, samples_N_all, 352)
+
+figure_4_7 = plot(p_10, p_50, p_150, p_all, layout = (2,2));
+
+avefig(p, joinpath(@OUTPUT, "figure_4_7.svg")); #src
+```
+
+\figalt{}{figure_4_7.svg}
 
 ## Figure 4.8
 TODO
@@ -285,7 +329,7 @@ TODO
 We can use our posterior samples for credible height nad reproduce the **left
 panel of **figure 4.9 (page 106)**.
 
-```julia:ex20
+```julia:ex21
 for row in 1:length(m4_3_chains)
     yi = m4_3_chains[:α][row] .+ m4_3_chains[:β][row] .* (xi .- mean(howell.weight))
     plot!(p, xi, yi, alpha=0.01, color="#000000", lab="");
@@ -302,7 +346,7 @@ To produce a Compatibility interval, I copied code from this
 [stackoverflow question](https://stackoverflow.com/questions/62028147/plotting-
 credible-intervals-in--from-turing-model).
 
-```julia:ex21
+```julia:ex22
 res = DataFrame(m4_3_chains)
 
 function m4_3_model_eq(weight, α, β, mean_weight)
@@ -333,7 +377,7 @@ The prediction interval is a little trickier as it requires to set an empty
 vector in lieu of the weight data. We this we can reproduce **figure 4.10
 (page 109)**.
 
-```julia:ex22
+```julia:ex23
 x_pred = xi
 m_test = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred)), hcat(x_pred), mean(howell.weight));
 predictions = predict(m_test, m4_3_chains)

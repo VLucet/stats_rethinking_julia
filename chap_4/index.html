@@ -154,7 +154,44 @@ A ╲ B │          :α           :β           :σ
 <pre><code class=language-julia >p &#61; scatter&#40;howell.weight, howell.height, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;;</code></pre>
 <img src="/stats_rethinking_julia/assets/chap_4/code/output/figure_4_6.svg" alt="">
 <h2 id=figure_47 ><a href="#figure_47" class=header-anchor >Figure 4.7</a></h2>
-<p>TODO</p>
+<p>For this figure we plot an increasing number of points to show the uncertainty decreasing as N increases.</p>
+<pre><code class=language-julia >howell_10 &#61; howell&#91;1:10,:&#93;
+howell_50 &#61; howell&#91;1:50,:&#93;
+howell_150 &#61; howell&#91;1:150,:&#93;
+
+m4_3_model_N10 &#61; m4_3&#40;howell_10.height, howell_10.weight, missing&#41;
+m4_3_model_N50 &#61; m4_3&#40;howell_50.height, howell_50.weight, missing&#41;
+m4_3_model_N150 &#61; m4_3&#40;howell_150.height, howell_150.weight, missing&#41;
+
+m4_3_N10_chains &#61; sample&#40;m4_3_model_N10, NUTS&#40;0.65&#41;, 1000&#41;
+m4_3_N50_chains &#61; sample&#40;m4_3_model_N50, NUTS&#40;0.65&#41;, 1000&#41;
+m4_3_N150_chains &#61; sample&#40;m4_3_model_N150, NUTS&#40;0.65&#41;, 1000&#41;
+
+the_20_rows &#61; sample&#40;1:1000, 20&#41;
+
+samples_N_all &#61; DataFrame&#40;m4_3_chains&#41;&#91;the_20_rows,&#91;:α,:β&#93;&#93;
+samples_N10 &#61; DataFrame&#40;m4_3_N10_chains&#41;&#91;the_20_rows,&#91;:α,:β&#93;&#93;
+samples_N50 &#61; DataFrame&#40;m4_3_N50_chains&#41;&#91;the_20_rows,&#91;:α,:β&#93;&#93;
+samples_N150 &#61; DataFrame&#40;m4_3_N150_chains&#41;&#91;the_20_rows,&#91;:α,:β&#93;&#93;
+
+function make_plot&#40;dat, samples, N&#41;
+    p_new &#61; scatter&#40;dat.weight, dat.height, xlab&#61;&quot;weight&quot;, ylab&#61;&quot;height&quot;, lab&#61;&quot;&quot;&#41;;
+    for row in eachrow&#40;samples&#41;
+        y &#61; row.α .&#43; row.β .* &#40;dat.weight .- mean&#40;dat.weight&#41;&#41;
+        plot&#33;&#40;p_new, dat.weight, y, alpha&#61;0.1, color&#61;&quot;#000000&quot;, lab&#61;&quot;&quot;,
+              title &#61; &quot;N &#61; &#36;N&quot;&#41;
+    end
+    return&#40;p_new&#41;
+end
+
+p_10 &#61; make_plot&#40;howell_10, samples_N10, 10&#41;
+p_50 &#61; make_plot&#40;howell_50, samples_N50, 50&#41;
+p_150 &#61; make_plot&#40;howell_150, samples_N150, 150&#41;
+p_all &#61; make_plot&#40;howell, samples_N_all, 352&#41;
+
+figure_4_7 &#61; plot&#40;p_10, p_50, p_150, p_all, layout &#61; &#40;2,2&#41;&#41;;</code></pre><pre><code class=plaintext >UndefVarError: avefig not defined
+</code></pre>
+<p><span style="color:red;">// Image matching '/assets/chap_4/code/figure_4_7.svg' not found. //</span></p>
 <h2 id=figure_48 ><a href="#figure_48" class=header-anchor >Figure 4.8</a></h2>
 <p>TODO</p>
 <h2 id=figure_49 ><a href="#figure_49" class=header-anchor >Figure 4.9</a></h2>
