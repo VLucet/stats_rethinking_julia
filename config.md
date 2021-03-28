@@ -6,7 +6,7 @@ The website_* must be defined for the RSS to work
 @def website_title = "Statistical Rethinking with Julia"
 @def website_descr = "An guide to reproduce the figures of Statistical Rethkinking with Julia and Turing"
 @def website_url   = "https://vlucet.github.io/stats_rethinking_julia/"
-@def authors = "Valentin Lucet (theme from Symbolics.jl)"
+@def authors = "Valentin Lucet (theme modified from SymbolicsUtils.jl)"
 
 @def prepath = "stats_rethinking_julia"
 
