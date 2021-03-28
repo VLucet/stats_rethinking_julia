@@ -195,7 +195,8 @@ figure_4_7 &#61; plot&#40;p_10, p_50, p_150, p_all, layout &#61; &#40;2,2&#41;&#
 <p>We plot the posterior of height for weight &#61; 50.</p>
 <pre><code class=language-julia >μ_at_50 &#61; samples_N_all.α .&#43; samples_N_all.β .* &#40;50 - mean&#40;howell.weight&#41;&#41;
 
-density&#40;μ_at_50&#41;</code></pre><pre><code class=plaintext >Plot{Plots.GRBackend() n=1}</code></pre>
+figure_4_8 &#61; density&#40;μ_at_50, xlab&#61;&quot;μ | weight &#61; 50&quot;, ylab&#61;&quot;Density&quot;, lab&#61;&quot;&quot;&#41;;</code></pre>
+<img src="/stats_rethinking_julia/assets/chap_4/code/output/figure_4_8.svg" alt="">
 <h2 id=figure_49 ><a href="#figure_49" class=header-anchor >Figure 4.9</a></h2>
 <p>We can use our posterior samples for credible height nad reproduce the <strong>left panel of **figure 4.9 &#40;page 106&#41;</strong>.</p>
 <pre><code class=language-julia >for row in 1:length&#40;m4_3_chains&#41;
