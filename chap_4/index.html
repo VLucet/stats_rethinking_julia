@@ -189,11 +189,13 @@ p_50 &#61; make_plot&#40;howell_50, samples_N50, 50&#41;
 p_150 &#61; make_plot&#40;howell_150, samples_N150, 150&#41;
 p_all &#61; make_plot&#40;howell, samples_N_all, 352&#41;
 
-figure_4_7 &#61; plot&#40;p_10, p_50, p_150, p_all, layout &#61; &#40;2,2&#41;&#41;;</code></pre><pre><code class=plaintext >UndefVarError: avefig not defined
-</code></pre>
-<p><span style="color:red;">// Image matching '/assets/chap_4/code/figure_4_7.svg' not found. //</span></p>
+figure_4_7 &#61; plot&#40;p_10, p_50, p_150, p_all, layout &#61; &#40;2,2&#41;&#41;;</code></pre>
+<img src="/stats_rethinking_julia/assets/chap_4/code/output/figure_4_7.svg" alt="">
 <h2 id=figure_48 ><a href="#figure_48" class=header-anchor >Figure 4.8</a></h2>
-<p>TODO</p>
+<p>We plot the posterior of height for weight &#61; 50.</p>
+<pre><code class=language-julia >μ_at_50 &#61; samples_N_all.α .&#43; samples_N_all.β .* &#40;50 - mean&#40;howell.weight&#41;&#41;
+
+density&#40;μ_at_50&#41;</code></pre><pre><code class=plaintext >Plot{Plots.GRBackend() n=1}</code></pre>
 <h2 id=figure_49 ><a href="#figure_49" class=header-anchor >Figure 4.9</a></h2>
 <p>We can use our posterior samples for credible height nad reproduce the <strong>left panel of **figure 4.9 &#40;page 106&#41;</strong>.</p>
 <pre><code class=language-julia >for row in 1:length&#40;m4_3_chains&#41;

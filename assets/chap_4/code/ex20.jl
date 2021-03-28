@@ -35,4 +35,4 @@ p_all = make_plot(howell, samples_N_all, 352)
 
 figure_4_7 = plot(p_10, p_50, p_150, p_all, layout = (2,2));
 
-avefig(p, joinpath(@OUTPUT, "figure_4_7.svg")); #src
+savefig(figure_4_7, joinpath(@OUTPUT, "figure_4_7.svg")); #src

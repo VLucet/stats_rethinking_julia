@@ -316,20 +316,27 @@ p_all = make_plot(howell, samples_N_all, 352)
 
 figure_4_7 = plot(p_10, p_50, p_150, p_all, layout = (2,2));
 
-avefig(p, joinpath(@OUTPUT, "figure_4_7.svg")); #src
+savefig(figure_4_7, joinpath(@OUTPUT, "figure_4_7.svg")); #src
 ```
 
 \figalt{}{figure_4_7.svg}
 
 ## Figure 4.8
-TODO
+
+We plot the posterior of height for weight = 50.
+
+```julia:ex21
+μ_at_50 = samples_N_all.α .+ samples_N_all.β .* (50 - mean(howell.weight))
+
+density(μ_at_50)
+```
 
 ## Figure 4.9
 
 We can use our posterior samples for credible height nad reproduce the **left
 panel of **figure 4.9 (page 106)**.
 
-```julia:ex21
+```julia:ex22
 for row in 1:length(m4_3_chains)
     yi = m4_3_chains[:α][row] .+ m4_3_chains[:β][row] .* (xi .- mean(howell.weight))
     plot!(p, xi, yi, alpha=0.01, color="#000000", lab="");
@@ -346,7 +353,7 @@ To produce a Compatibility interval, I copied code from this
 [stackoverflow question](https://stackoverflow.com/questions/62028147/plotting-
 credible-intervals-in--from-turing-model).
 
-```julia:ex22
+```julia:ex23
 res = DataFrame(m4_3_chains)
 
 function m4_3_model_eq(weight, α, β, mean_weight)
@@ -377,7 +384,7 @@ The prediction interval is a little trickier as it requires to set an empty
 vector in lieu of the weight data. We this we can reproduce **figure 4.10
 (page 109)**.
 
-```julia:ex23
+```julia:ex24
 x_pred = xi
 m_test = m4_3(Vector{Union{Missing, Float64}}(undef, length(x_pred)), hcat(x_pred), mean(howell.weight));
 predictions = predict(m_test, m4_3_chains)

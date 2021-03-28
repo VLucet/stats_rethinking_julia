@@ -184,7 +184,11 @@ p_all = make_plot(howell, samples_N_all, 352)
 
 figure_4_7 = plot(p_10, p_50, p_150, p_all, layout = (2,2));
 
-avefig(p, joinpath(@OUTPUT, "figure_4_7.svg")); #src
+savefig(figure_4_7, joinpath(@OUTPUT, "figure_4_7.svg")); #src
+
+μ_at_50 = samples_N_all.α .+ samples_N_all.β .* (50 - mean(howell.weight))
+
+density(μ_at_50)
 
 for row in 1:length(m4_3_chains)
     yi = m4_3_chains[:α][row] .+ m4_3_chains[:β][row] .* (xi .- mean(howell.weight))
