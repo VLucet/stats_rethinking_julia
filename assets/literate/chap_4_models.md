@@ -116,7 +116,7 @@ end;
 Cube model:
 
 ```julia:ex8
-@model function m4_5_2(height, weight, weight_squared, weight_cubed)
+@model function m4_6(height, weight, weight_squared, weight_cubed)
 
     α ~ Normal(178, 20)
     β1 ~ LogNormal(0, 1)
