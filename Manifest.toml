@@ -82,6 +82,12 @@ git-tree-sha1 = "f31f50712cbdf40ee8287f0443b57503e34122ef"
 uuid = "39de3d68-74b9-583c-8d2d-e117c070f3a9"
 version = "0.4.3"
 
+[[BSplines]]
+deps = ["LinearAlgebra", "OffsetArrays", "RecipesBase"]
+git-tree-sha1 = "6265cc152b24f92ea8038b8b18bea8ac3a9674eb"
+uuid = "488c2830-172b-11e9-1591-253b8a7df96d"
+version = "0.3.1"
+
 [[BangBang]]
 deps = ["Compat", "ConstructionBase", "Future", "InitialValues", "LinearAlgebra", "Requires", "Setfield", "Tables", "ZygoteRules"]
 git-tree-sha1 = "d53b1eaefd48e233545d21f5b764c8ee54df4a09"
@@ -1006,11 +1012,6 @@ deps = ["LinearAlgebra"]
 git-tree-sha1 = "17275485f373e6673f7e7f97051f703ed5b15b20"
 uuid = "85a6dd25-e78a-55b7-8502-1745935b8125"
 version = "0.2.4"
-
-[[PrettyPrinting]]
-git-tree-sha1 = "024b75ae333df50ab552fd78727ad3279beac871"
-uuid = "54e16d92-306c-5ea0-a30b-337be88ac337"
-version = "0.2.1"
 
 [[PrettyTables]]
 deps = ["Crayons", "Formatting", "Markdown", "Reexport", "Tables"]

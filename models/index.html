@@ -69,7 +69,7 @@ end;</code></pre> <h2 id=45 ><a href="#45" class=header-anchor >4.5</a></h2> <p>
         height&#91;i&#93; ~ Normal&#40;μ&#91;i&#93;, σ&#41;
     end
 
-end;</code></pre> <p>Cube model:</p> <pre><code class=language-julia >@model function m4_6&#40;height, weight, weight_squared, weight_cubed&#41;
+end;</code></pre> <h2 id=46 ><a href="#46" class=header-anchor >4.6</a></h2> <p>Cube model:</p> <pre><code class=language-julia >@model function m4_6&#40;height, weight, weight_squared, weight_cubed&#41;
 
     α ~ Normal&#40;178, 20&#41;
     β1 ~ LogNormal&#40;0, 1&#41;
@@ -83,4 +83,4 @@ end;</code></pre> <p>Cube model:</p> <pre><code class=language-julia >@model fun
         height&#91;i&#93; ~ Normal&#40;μ&#91;i&#93;, σ&#41;
     end
 
-end;</code></pre> <div class=page-foot > <div class=copyright > &copy; Valentin Lucet (theme modified from SymbolicsUtils.jl). Last modified: March 28, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a>. </div> </div> </div> </div> <script> var els = document.querySelectorAll(".language-julia") for (var i=0, l = els.length; i < l; i++) { var el = els[i] var out = el.parentNode.nextSibling if (out.tagName === "PRE") { out.className = out.className + " code-output" } } </script> <script src="/stats_rethinking_julia/libs/highlight/highlight.pack.js"></script> <script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: ' '});</script>
+end;</code></pre> <div class=page-foot > <div class=copyright > &copy; Valentin Lucet (theme modified from SymbolicsUtils.jl). Last modified: March 29, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a>. </div> </div> </div> </div> <script> var els = document.querySelectorAll(".language-julia") for (var i=0, l = els.length; i < l; i++) { var el = els[i] var out = el.parentNode.nextSibling if (out.tagName === "PRE") { out.className = out.className + " code-output" } } </script> <script src="/stats_rethinking_julia/libs/highlight/highlight.pack.js"></script> <script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: ' '});</script>
