@@ -488,7 +488,55 @@ savefig(figure_4_11, joinpath(@OUTPUT, "figure_4_11.svg")); #src
 # \figalt{}{figure_4_11.svg}
 
 # ## Figure 4.12
-# TODO
+# **NOTE:** This fgure is not reproduced on this page.
 
 # ## Figure 4.13
-# TODO
+
+# We know load a different dataset.
+
+data_path = joinpath(TuringModels.project_root, "data", "cherry_blossoms.csv")
+cherry = CSV.read(data_path, DataFrame; delim=';', missingstrings=["NA"])
+
+cherry_dat = cherry[: , [:year, :doy]]
+cherry_dat = cherry_dat[completecases(cherry_dat) , :];
+
+# We make a spline with 17 basis functions.
+
+num_knots = 15
+knot_list = quantile(cherry_dat.year, Weights(range(0, 1, length = num_knots)))
+B = BSplineBasis(4, knot_list); 
+
+# We can plot the first part of the figure.
+
+p1 = plot(B, lab = "", xlab = "year", ylab = "basis value");
+
+# Now we evaluate the splines to then fit the weigths.
+
+basis_matrix = basismatrix(B, cherry_dat.year)
+
+m4_7_model = m4_7(cherry_dat.doy, basis_matrix)
+m4_7_chains = sample(m4_7_model, NUTS(0.65), 1000)
+
+m4_7_res = DataFrame(m4_7_chains)[:, Between(15, 33)]
+optimal = optimize(m4_7_model, MAP())
+
+p2 = plot()
+for i in 2:18
+    plot!(p2, cherry_dat.year, basis_matrix[:,i-1] .* optimal.values[i])
+end;
+
+plot(p2, lab = "", xlab = "year", ylab = "basis * weight");
+
+# Now , the last part of the figure
+
+p3 = scatter(cherry_dat.year, cherry_dat.doy, alpha = 0.2, lab = "")
+spline = optimal.values[1] .+ basis_matrix * optimal.values[2:18]
+plot!(p3, cherry_dat.year, spline, linewidth=3, lab = "",
+      xlab = "year", ylab = "Day in year") ; 
+
+# **TODO**: Fabricate interval
+
+figure_4_12 = plot(p1, p2, p3, layout = (3,1))
+savefig(figure_4_12, joinpath(@OUTPUT, "figure_4_12.svg")); #src 
+
+# \figalt{}{figure_4_12.svg}
