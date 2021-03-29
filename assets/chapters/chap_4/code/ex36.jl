@@ -5,7 +5,7 @@ end
 
 arr_4_7 = [m4_7_model_eq(m4_7_res[i,18], basis_matrix, m4_7_res[i,1:17])
            for i in 1:size(m4_7_res, 1)]
-mat_4_7 = reduce(vcat, arr_4_7)
+mat_4_7 = reduce(hcat, arr_4_7)
 
 mean_vector = [mean(mat_4_7[i,:]) for i in 1:size(mat_4_7, 1)]
 quantiles = [quantile(mat_4_7[i,:], [0.1, 0.9]) for i in 1:size(mat_4_7, 1)]
