@@ -348,9 +348,43 @@ plot&#33;&#40;p3, x_pred_s, predict_interval_4_6&#91;2&#93;,
 <pre><code class=language-julia >figure_4_11 &#61; plot&#40;p1, p2, p3, layout &#61; &#40;1, 3&#41;&#41;;</code></pre>
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_11.svg" alt="">
 <h2 id=figure_412 ><a href="#figure_412" class=header-anchor >Figure 4.12</a></h2>
-<p>TODO</p>
+<p><strong>NOTE:</strong> This fgure is not reproduced on this page.</p>
 <h2 id=figure_413 ><a href="#figure_413" class=header-anchor >Figure 4.13</a></h2>
-<p>TODO</p>
+<p>We know load a different dataset.</p>
+<pre><code class=language-julia >data_path &#61; joinpath&#40;TuringModels.project_root, &quot;data&quot;, &quot;cherry_blossoms.csv&quot;&#41;
+cherry &#61; CSV.read&#40;data_path, DataFrame; delim&#61;&#39;;&#39;, missingstrings&#61;&#91;&quot;NA&quot;&#93;&#41;
+
+cherry_dat &#61; cherry&#91;: , &#91;:year, :doy&#93;&#93;
+cherry_dat &#61; cherry_dat&#91;completecases&#40;cherry_dat&#41; , :&#93;;</code></pre>
+<p>We make a spline with 17 basis functions.</p>
+<pre><code class=language-julia >num_knots &#61; 15
+knot_list &#61; quantile&#40;cherry_dat.year, Weights&#40;range&#40;0, 1, length &#61; num_knots&#41;&#41;&#41;
+B &#61; BSplineBasis&#40;4, knot_list&#41;;</code></pre>
+<p>We can plot the first part of the figure.</p>
+<pre><code class=language-julia >p1 &#61; plot&#40;B, lab &#61; &quot;&quot;, xlab &#61; &quot;year&quot;, ylab &#61; &quot;basis value&quot;&#41;;</code></pre>
+<p>Now we evaluate the splines to then fit the weigths.</p>
+<pre><code class=language-julia >basis_matrix &#61; basismatrix&#40;B, cherry_dat.year&#41;
+
+m4_7_model &#61; m4_7&#40;cherry_dat.doy, basis_matrix&#41;
+m4_7_chains &#61; sample&#40;m4_7_model, NUTS&#40;0.65&#41;, 1000&#41;
+
+m4_7_res &#61; DataFrame&#40;m4_7_chains&#41;&#91;:, Between&#40;15, 33&#41;&#93;
+optimal &#61; optimize&#40;m4_7_model, MAP&#40;&#41;&#41;
+
+p2 &#61; plot&#40;&#41;
+for i in 2:18
+    plot&#33;&#40;p2, cherry_dat.year, basis_matrix&#91;:,i-1&#93; .* optimal.values&#91;i&#93;&#41;
+end;
+
+plot&#40;p2, lab &#61; &quot;&quot;, xlab &#61; &quot;year&quot;, ylab &#61; &quot;basis * weight&quot;&#41;;</code></pre>
+<p>Now , the last part of the figure</p>
+<pre><code class=language-julia >p3 &#61; scatter&#40;cherry_dat.year, cherry_dat.doy, alpha &#61; 0.2, lab &#61; &quot;&quot;&#41;
+spline &#61; optimal.values&#91;1&#93; .&#43; basis_matrix * optimal.values&#91;2:18&#93;
+plot&#33;&#40;p3, cherry_dat.year, spline, linewidth&#61;3, lab &#61; &quot;&quot;,
+      xlab &#61; &quot;year&quot;, ylab &#61; &quot;Day in year&quot;&#41; ;</code></pre>
+<p><strong>TODO</strong>: Fabricate interval</p>
+<pre><code class=language-julia >figure_4_12 &#61; plot&#40;p1, p2, p3, layout &#61; &#40;3,1&#41;&#41;</code></pre>
+<img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_12.svg" alt="">
 
 <div class=page-foot >
   <div class=copyright >
