@@ -1,6 +1,7 @@
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Dierckx = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Franklin = "713c75ef-9fc9-4b05-94a9-213340da978e"
 Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"

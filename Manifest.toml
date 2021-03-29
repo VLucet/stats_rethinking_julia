@@ -270,6 +270,18 @@ version = "0.1.1"
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
+[[Dierckx]]
+deps = ["Dierckx_jll"]
+git-tree-sha1 = "5fefbe52e9a6e55b8f87cb89352d469bd3a3a090"
+uuid = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
+version = "0.5.1"
+
+[[Dierckx_jll]]
+deps = ["CompilerSupportLibraries_jll", "Libdl", "Pkg"]
+git-tree-sha1 = "a580560f526f6fc6973e8bad2b036514a4e3b013"
+uuid = "cd4c43a9-7502-52ba-aa6d-59fb2a88580b"
+version = "0.0.1+0"
+
 [[DiffResults]]
 deps = ["StaticArrays"]
 git-tree-sha1 = "c18e98cba888c6c25d1c3b048e4b3380ca956805"
