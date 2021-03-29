@@ -5,6 +5,5 @@ using TuringModels
 using StatsPlots
 using StatsBase
 using Optim
-using PrettyPrinting
 using Random
 using BSplines
