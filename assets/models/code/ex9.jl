@@ -13,4 +13,4 @@
         D[i] ~ Normal(μ[i], σ)
     end
 
-end
+end;
