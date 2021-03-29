@@ -7,4 +7,4 @@ using StatsBase
 using Optim
 using PrettyPrinting
 using Random
-using Dierckx
+using BSplines
