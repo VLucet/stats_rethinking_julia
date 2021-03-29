@@ -368,7 +368,7 @@ B &#61; BSplineBasis&#40;4, knot_list&#41;;</code></pre>
 m4_7_model &#61; m4_7&#40;cherry_dat.doy, basis_matrix&#41;
 m4_7_chains &#61; sample&#40;m4_7_model, NUTS&#40;0.65&#41;, 1000&#41;
 
-m4_7_res &#61; DataFrame&#40;m4_7_chains&#41;&#91;:, Between&#40;15, 33&#41;&#93;
+m4_7_res &#61; Array&#40;DataFrame&#40;m4_7_chains&#41;&#91;:, Between&#40;15, 33&#41;&#93;&#41;
 optimal &#61; optimize&#40;m4_7_model, MAP&#40;&#41;&#41;
 
 p2 &#61; plot&#40;&#41;
@@ -378,12 +378,28 @@ end;
 
 plot&#40;p2, lab &#61; &quot;&quot;, xlab &#61; &quot;year&quot;, ylab &#61; &quot;basis * weight&quot;&#41;;</code></pre>
 <p>Now , the last part of the figure</p>
-<pre><code class=language-julia >p3 &#61; scatter&#40;cherry_dat.year, cherry_dat.doy, alpha &#61; 0.2, lab &#61; &quot;&quot;&#41;
+<pre><code class=language-julia >function m4_7_model_eq&#40;α, mat_basis, w&#41;
+    D &#61; α .&#43; mat_basis * w
+end
+
+arr_4_7 &#61; &#91;m4_7_model_eq&#40;m4_7_res&#91;i,18&#93;, basis_matrix, m4_7_res&#91;i,1:17&#93;&#41;
+           for i in 1:size&#40;m4_7_res, 1&#41;&#93;
+mat_4_7 &#61; reduce&#40;vcat, arr_4_7&#41;
+
+mean_vector &#61; &#91;mean&#40;mat_4_7&#91;i,:&#93;&#41; for i in 1:size&#40;mat_4_7, 1&#41;&#93;
+quantiles &#61; &#91;quantile&#40;mat_4_7&#91;i,:&#93;, &#91;0.1, 0.9&#93;&#41; for i in 1:size&#40;mat_4_7, 1&#41;&#93;
+lower &#61; &#91;q&#91;1&#93; - m for &#40;q, m&#41; in zip&#40;quantiles, mean_vector&#41;&#93;
+upper &#61; &#91;q&#91;2&#93; - m for &#40;q, m&#41; in zip&#40;quantiles, mean_vector&#41;&#93;
+
+p3 &#61; scatter&#40;cherry_dat.year, cherry_dat.doy, alpha &#61; 0.2, lab &#61; &quot;&quot;&#41;
 spline &#61; optimal.values&#91;1&#93; .&#43; basis_matrix * optimal.values&#91;2:18&#93;
 plot&#33;&#40;p3, cherry_dat.year, spline, linewidth&#61;3, lab &#61; &quot;&quot;,
-      xlab &#61; &quot;year&quot;, ylab &#61; &quot;Day in year&quot;&#41; ;</code></pre>
-<p><strong>TODO</strong>: Fabricate interval</p>
-<pre><code class=language-julia >figure_4_12 &#61; plot&#40;p1, p2, p3, layout &#61; &#40;3,1&#41;&#41;</code></pre>
+      xlab &#61; &quot;year&quot;, ylab &#61; &quot;Day in year&quot;&#41;
+plot&#33;&#40;p3, cherry_dat.year, mean_vector,
+      ribbon &#61; &#91;lower, upper&#93;, lab&#61;&quot;&quot;, linewidth&#61;0&#41;
+
+figure_4_12 &#61; plot&#40;p1, p2, p3, layout &#61; &#40;3,1&#41;&#41;;</code></pre><pre><code class=plaintext >BoundsError: attempt to access 827-element Vector{Float64} at index [1:827000]
+</code></pre>
 <img src="/stats_rethinking_julia/assets/chapters/chap_4/code/output/figure_4_12.svg" alt="">
 
 <div class=page-foot >
