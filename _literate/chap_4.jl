@@ -527,7 +527,7 @@ end;
 
 plot(p2, lab = "", xlab = "year", ylab = "basis * weight");
 
-# Now , the last part of the figure
+# Now , the last part of the figure.
 
 function m4_7_model_eq(α, mat_basis, w)
     D = α .+ mat_basis * w
