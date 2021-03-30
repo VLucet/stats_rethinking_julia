@@ -1,6 +1,6 @@
 ## CHAPTER 4
 
-using Turing #hide
+using Turing
 
 #  ## 4.1
 
