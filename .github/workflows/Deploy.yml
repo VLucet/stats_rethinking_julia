@@ -14,7 +14,7 @@ jobs:
         persist-credentials: false
 
     - name: Install system dependencies
-      run : sudo apt-get install qt5-default
+    - run: sudo apt-get install qt5-default
 
     # NOTE: Python is necessary for the pre-rendering (minification) step
     - name: Install python
@@ -23,7 +23,7 @@ jobs:
         python-version: '3.8'
     # NOTE: Here you can install dependencies such as matplotlib if you use
     # packages such as PyPlot.
-      run: pip install matplotlib
+    - run: pip install matplotlib
 
     - name: Install Julia
       uses: julia-actions/setup-julia@v1
@@ -37,7 +37,7 @@ jobs:
     #   Julia packages which may be required to successfully build your site.
     #   The last line should be `optimize()` though you may want to give it
     #   specific arguments, see the documentation or ?optimize in the REPL.
-      run: julia -e '
+    - run: julia -e '
             using Pkg; Pkg.activate("."); Pkg.instantiate();
             using NodeJS; run(`$(npm_cmd()) install highlight.js`);
             using Franklin;
