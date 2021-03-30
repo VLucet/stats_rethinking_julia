@@ -14,7 +14,7 @@ You are most welcome to contribute [here](https://github.com/VLucet/stats_rethin
 
 ### By chapter:
 
-  * Chapter 1 to 3: not 
-  * [Chapter 4](chapters/chap_4/) *1 missing figure*
-  * [Chapter 5](chapters/chap_5/) *WIP*
-  * TBC
+  * Chapter 1 to 3: not included at the moment
+  * [Chapter 4](chapters/chap_4/): *1 missing figure*
+  * [Chapter 5](chapters/chap_5/): *WIP*
+  * More chapters TBC

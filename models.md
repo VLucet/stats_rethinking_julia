@@ -12,3 +12,7 @@ hascode = true
 ## Chapter 4
 
 \literate{/_literate/chap_4_models.jl}
+
+## Chapter 5
+
+\literate{/_literate/chap_5_models.jl}
