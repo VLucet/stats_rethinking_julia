@@ -1,6 +1,6 @@
 <!--This file was generated, do not modify it.-->
 ```julia:ex1
-# CHAPTER 4 MODELS
+# CHAPTER 4
 
 using Turing
 ```
