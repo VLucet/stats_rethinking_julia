@@ -1,5 +1,5 @@
 ## CHAPTER 5
 
-using Turing #src
+using Turing
 
 #  ## 5.1
