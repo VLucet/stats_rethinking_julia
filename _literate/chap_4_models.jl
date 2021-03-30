@@ -1,6 +1,6 @@
-## CHAPTER 4 MODELS
+## CHAPTER 4
 
-using Turing
+using Turing #src
 
 #  ## 4.1
 @model function m4_1(height)
