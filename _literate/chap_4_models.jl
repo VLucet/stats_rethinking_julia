@@ -1,8 +1,9 @@
 ## CHAPTER 4
 
-using Turing #src
+using Turing #hide
 
 #  ## 4.1
+
 @model function m4_1(height)
 
     σ ~ Uniform(0, 50)
