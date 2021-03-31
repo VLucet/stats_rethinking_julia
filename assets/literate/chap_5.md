@@ -35,5 +35,5 @@ annotate!(figure_5_1, annot);
 savefig(figure_5_1, joinpath(@OUTPUT, "figure_5_1.svg")); #src
 ```
 
-\figalt{}{figure_4_12.svg}
+\figalt{}{figure_5_1.svg}
 
